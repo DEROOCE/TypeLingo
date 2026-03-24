@@ -82,13 +82,6 @@ TypeLingo currently supports two provider modes:
 - supports multiple API profiles
 - supports multiple system prompt profiles for different translation styles
 
-Examples of compatible providers include:
-
-- OpenAI-compatible gateways
-- SiliconFlow
-- self-hosted compatible endpoints
-- other vendors exposing the `chat/completions` interface
-
 ## Packaging
 
 ### Build a Local App Bundle
