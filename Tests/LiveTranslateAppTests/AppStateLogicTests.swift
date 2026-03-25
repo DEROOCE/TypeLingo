@@ -84,4 +84,26 @@ struct AppStateLogicTests {
 
         defaults.removePersistentDomain(forName: suiteName)
     }
+
+    @MainActor
+    @Test func clearCapturedTextResetsVisibleTranslationState() {
+        let appState = AppState()
+        appState.updateCapturedText(
+            CapturedTextSnapshot(
+                appName: "Notes",
+                bundleIdentifier: "com.apple.Notes",
+                role: "AXTextArea",
+                text: "hello"
+            )
+        )
+        appState.translatedText = "你好"
+        appState.errorMessage = "temporary"
+
+        appState.clearCapturedText()
+
+        #expect(appState.sourceText.isEmpty)
+        #expect(appState.translatedText.isEmpty)
+        #expect(appState.errorMessage == nil)
+        #expect(appState.providerStatus == "Waiting for input" || appState.providerStatus == "Accessibility permission required")
+    }
 }

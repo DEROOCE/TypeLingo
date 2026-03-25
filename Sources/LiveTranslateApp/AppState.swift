@@ -555,6 +555,19 @@ final class AppState: ObservableObject {
         scheduleTranslation()
     }
 
+    func clearCapturedText() {
+        guard !sourceText.isEmpty || !translatedText.isEmpty || errorMessage != nil else {
+            providerStatus = isAccessibilityTrusted ? "Waiting for input" : "Accessibility permission required"
+            return
+        }
+
+        translationTask?.cancel()
+        sourceText = ""
+        translatedText = ""
+        errorMessage = nil
+        providerStatus = isAccessibilityTrusted ? "Waiting for input" : "Accessibility permission required"
+    }
+
     func chooseGoogleProvider() {
         selectedProvider = .googleWeb
     }

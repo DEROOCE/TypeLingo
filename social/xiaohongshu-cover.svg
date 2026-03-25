@@ -1,0 +1,82 @@
+<svg width="1242" height="1660" viewBox="0 0 1242 1660" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="80" x2="1120" y2="1540" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6F0E6"/>
+      <stop offset="0.55" stop-color="#E7F1EF"/>
+      <stop offset="1" stop-color="#DCE6F4"/>
+    </linearGradient>
+    <linearGradient id="card" x1="216" y1="232" x2="1030" y2="1418" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10252D"/>
+      <stop offset="1" stop-color="#173E49"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="744" y1="262" x2="1004" y2="524" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF8B63"/>
+      <stop offset="1" stop-color="#FFD4A8"/>
+    </linearGradient>
+    <filter id="shadow" x="154" y="180" width="934" height="1306" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="20"/>
+      <feGaussianBlur stdDeviation="26"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.067 0 0 0 0 0.145 0 0 0 0 0.180 0 0 0 0.16 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect width="1242" height="1660" fill="url(#bg)"/>
+
+  <circle cx="1026" cy="234" r="174" fill="#FFDCC6" fill-opacity="0.82"/>
+  <circle cx="172" cy="1480" r="210" fill="#CFE8E0" fill-opacity="0.72"/>
+  <circle cx="1110" cy="1400" r="132" fill="#D7E0F2" fill-opacity="0.82"/>
+
+  <g filter="url(#shadow)">
+    <rect x="206" y="212" width="830" height="1202" rx="42" fill="url(#card)"/>
+    <rect x="206.75" y="212.75" width="828.5" height="1200.5" rx="41.25" stroke="white" stroke-opacity="0.18" stroke-width="1.5"/>
+  </g>
+
+  <rect x="266" y="286" width="250" height="54" rx="27" fill="white" fill-opacity="0.12"/>
+  <text x="391" y="321" text-anchor="middle" fill="#F6EFE3" font-size="28" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-weight="600" letter-spacing="1.5">项目复盘</text>
+
+  <text x="278" y="470" fill="#FFF5E9" font-size="78" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-weight="700">
+    <tspan x="278" dy="0">做完这个小工具后</tspan>
+    <tspan x="278" dy="104">我发现最难的</tspan>
+    <tspan x="278" dy="104">根本不是翻译</tspan>
+  </text>
+
+  <text x="278" y="846" fill="#C9D9DD" font-size="34" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-weight="500">
+    <tspan x="278" dy="0">一个 macOS 实时翻译字幕工具的开发复盘</tspan>
+  </text>
+
+  <g>
+    <rect x="278" y="930" width="686" height="312" rx="28" fill="white" fill-opacity="0.08"/>
+    <rect x="278.75" y="930.75" width="684.5" height="310.5" rx="27.25" stroke="white" stroke-opacity="0.12" stroke-width="1.5"/>
+
+    <text x="328" y="1016" fill="#FFF3E8" font-size="30" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-weight="600">这次最大的 3 个体会：</text>
+
+    <text x="328" y="1086" fill="#D6E5E8" font-size="28" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-weight="500">
+      <tspan x="328" dy="0">1. 系统级产品，难点通常藏在底层</tspan>
+      <tspan x="328" dy="56">2. 原型阶段最重要的是先打通闭环</tspan>
+      <tspan x="328" dy="56">3. 打包、权限、分发也属于产品体验</tspan>
+    </text>
+  </g>
+
+  <g>
+    <rect x="858" y="280" width="110" height="110" rx="28" fill="url(#accent)"/>
+    <rect x="890" y="312" width="46" height="12" rx="6" fill="#173E49"/>
+    <rect x="890" y="340" width="56" height="12" rx="6" fill="#173E49" fill-opacity="0.88"/>
+    <rect x="884" y="366" width="66" height="12" rx="6" fill="#173E49" fill-opacity="0.78"/>
+  </g>
+
+  <g>
+    <rect x="856" y="430" width="126" height="126" rx="32" fill="#6CE8D1"/>
+    <rect x="892" y="468" width="54" height="12" rx="6" fill="#173E49"/>
+    <rect x="882" y="496" width="64" height="12" rx="6" fill="#173E49" fill-opacity="0.86"/>
+    <rect x="876" y="522" width="72" height="12" rx="6" fill="#173E49" fill-opacity="0.78"/>
+  </g>
+
+  <path d="M836 588C866 604 894 616 924 624C948 631 974 635 999 635" stroke="#F8ECDD" stroke-width="20" stroke-linecap="round"/>
+  <path d="M978 604L1017 635L972 658" stroke="#F8ECDD" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="278" y="1324" fill="#9AB2B8" font-size="26" font-family="'SF Pro Display','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-weight="600" letter-spacing="2.5">TYPELINGO / MACOS / LIVE TRANSLATION</text>
+</svg>

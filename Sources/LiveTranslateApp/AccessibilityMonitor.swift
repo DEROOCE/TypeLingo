@@ -53,10 +53,12 @@ final class AccessibilityMonitor {
         }
 
         guard let element = focusedUIElement() else {
+            clearSnapshotIfNeeded()
             return
         }
 
         guard let snapshot = snapshotForFocusedElement(element) else {
+            clearSnapshotIfNeeded()
             return
         }
 
@@ -67,6 +69,17 @@ final class AccessibilityMonitor {
         lastSnapshot = snapshot
         Task { @MainActor [weak appState] in
             appState?.updateCapturedText(snapshot)
+        }
+    }
+
+    private func clearSnapshotIfNeeded() {
+        guard lastSnapshot != nil else {
+            return
+        }
+
+        lastSnapshot = nil
+        Task { @MainActor [weak appState] in
+            appState?.clearCapturedText()
         }
     }
 
