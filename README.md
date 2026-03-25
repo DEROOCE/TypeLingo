@@ -1,5 +1,7 @@
 # TypeLingo
 
+[中文文档](./README.zh-CN.md)
+
 TypeLingo is a macOS live subtitle overlay that watches the currently focused text field, translates the text in near real time, and renders the result in a floating on-screen subtitle panel.
 
 It is designed for:
@@ -113,6 +115,40 @@ dist/TypeLingo-0.1.0.dmg
 
 Without a real `Developer ID Application` certificate and notarization, these artifacts are suitable only for local use or limited internal testing.
 
+## Installation Notes
+
+If a user installs TypeLingo and macOS shows a warning like:
+
+> Apple cannot verify "TypeLingo" is free of malware that may harm your Mac or compromise your privacy.
+
+that is expected for the current release builds.
+
+At the moment, TypeLingo release artifacts are:
+
+- ad-hoc signed
+- not notarized by Apple
+
+That means macOS Gatekeeper may block the app on first launch.
+
+### Command-Line Workaround
+
+Advanced users can also remove the quarantine attribute manually:
+
+```bash
+xattr -dr com.apple.quarantine '/Applications/TypeLingo.app'
+```
+
+Then launch the app again.
+
+### Why This Happens
+
+This warning does not automatically mean the app is malicious. It appears because the current public build is not yet distributed with:
+
+- a paid Apple `Developer ID Application` signature
+- Apple notarization
+
+Once TypeLingo is signed with a real Developer ID certificate and notarized, this warning can be removed for end users.
+
 ## Developer ID Signing And Notarization
 
 For public distribution on macOS, you need:
@@ -151,6 +187,8 @@ If you use it, expect:
 - a practical local tool
 - fast iteration
 - explicit macOS platform constraints
+
+For a detailed retrospective on the first development phase, see [POSTMORTEM.md](./POSTMORTEM.md) or the Chinese version [POSTMORTEM.zh-CN.md](./POSTMORTEM.zh-CN.md).
 
 ## License
 
