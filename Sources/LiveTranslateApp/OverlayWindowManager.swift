@@ -113,28 +113,48 @@ struct OverlayView: View {
         .padding(8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.clear)
+        .environment(\.colorScheme, .dark)
     }
 
     private var headerRow: some View {
         HStack(alignment: .center, spacing: 12) {
             closeButton
 
+            toolbarGroup
+
             Spacer()
-            providerMenu
-            targetLanguageMenu
             settingsButton
-            if !appState.isAccessibilityTrusted {
-                permissionButton
-            }
         }
         .padding(.horizontal, 14)
         .padding(.top, 12)
     }
 
+    private var toolbarGroup: some View {
+        HStack(spacing: 0) {
+            providerMenu
+
+            Rectangle()
+                .fill(Color.white.opacity(0.06))
+                .frame(width: 1, height: 24)
+
+            targetLanguageMenu
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 3)
+        .background(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .fill(Color.black.opacity(0.001))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .stroke(Color.white.opacity(0.05), lineWidth: 1)
+        )
+    }
+
     private var translationCard: some View {
         VStack(alignment: .leading, spacing: 6) {
             ScrollView(.vertical, showsIndicators: true) {
-                Text(appState.translatedText.isEmpty ? "Translation will appear here." : appState.translatedText)
+                Text(appState.translatedText.isEmpty ? appState.targetLanguage.emptyTranslationPlaceholder : appState.translatedText)
                     .font(.system(size: appState.subtitleFontSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineSpacing(4)
@@ -163,14 +183,6 @@ struct OverlayView: View {
         .buttonStyle(OverlayCapsuleButtonStyle())
     }
 
-    private var permissionButton: some View {
-        Button("Grant Permission") {
-            appState.requestAccessibilityPermission()
-            appState.openAccessibilitySettings()
-        }
-        .buttonStyle(OverlayCapsuleButtonStyle())
-    }
-
     private var targetLanguageMenu: some View {
         Menu {
             ForEach(TargetLanguage.allCases) { language in
@@ -185,18 +197,10 @@ struct OverlayView: View {
                 }
             }
         } label: {
-            Text(appState.targetLanguage.displayName)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.82))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(.white.opacity(0.08))
-                )
+            OverlaySecondaryMenuLabel(title: appState.targetLanguage.displayName)
         }
         .menuStyle(.borderlessButton)
-        .buttonStyle(OverlayCapsuleButtonStyle())
+        .buttonStyle(.plain)
     }
 
     private var providerMenu: some View {
@@ -227,18 +231,10 @@ struct OverlayView: View {
                 }
             }
         } label: {
-            Text(appState.currentProviderDisplayName)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.82))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(.white.opacity(0.08))
-                )
+            OverlaySecondaryMenuLabel(title: appState.currentProviderDisplayName)
         }
         .menuStyle(.borderlessButton)
-        .buttonStyle(OverlayCapsuleButtonStyle())
+        .buttonStyle(.plain)
     }
 
     private var closeButton: some View {
@@ -252,6 +248,23 @@ struct OverlayView: View {
                 .background(Circle().fill(Color.red))
         }
         .buttonStyle(.plain)
+    }
+}
+
+struct OverlaySecondaryMenuLabel: View {
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Text(title)
+                .lineLimit(1)
+                .truncationMode(.tail)
+        }
+        .font(.system(size: 12, weight: .medium, design: .rounded))
+        .foregroundStyle(.white.opacity(0.68))
+        .padding(.horizontal, 11)
+        .padding(.vertical, 7)
+        .frame(minWidth: 96, alignment: .leading)
     }
 }
 

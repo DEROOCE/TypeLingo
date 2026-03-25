@@ -75,6 +75,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         showSettingsWindow()
+
+        if appState.shouldPromptAccessibilityOnLaunch() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+                self?.appState.requestAccessibilityPermission()
+            }
+        }
     }
 
     private func registerWakeShortcut() {

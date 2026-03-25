@@ -54,6 +54,24 @@ struct AppStateLogicTests {
         #expect(ShortcutKey(keyCode: UInt16(kVK_Return)) == nil)
     }
 
+    @Test func emptyPlaceholderFollowsTargetLanguage() {
+        #expect(TargetLanguage.english.emptyTranslationPlaceholder == "Translation will appear here.")
+        #expect(TargetLanguage.simplifiedChinese.emptyTranslationPlaceholder == "翻译结果会显示在这里。")
+    }
+
+    @Test func wakeShortcutLocalizedDisplayNameStaysReadable() {
+        let shortcut = WakeShortcut(
+            key: .t,
+            includesControl: true,
+            includesOption: false,
+            includesCommand: true,
+            includesShift: false
+        )
+
+        #expect(shortcut.localizedDisplayName(language: .english) == "Control + Command + T")
+        #expect(shortcut.localizedDisplayName(language: .simplifiedChinese) == "Control + Command + T")
+    }
+
     @MainActor
     @Test func appStateInitializationMigratesPlaintextKeysOutOfDefaults() throws {
         let suiteName = "LiveTranslateAppTests.\(UUID().uuidString)"
@@ -104,6 +122,28 @@ struct AppStateLogicTests {
         #expect(appState.sourceText.isEmpty)
         #expect(appState.translatedText.isEmpty)
         #expect(appState.errorMessage == nil)
-        #expect(appState.providerStatus == "Waiting for input" || appState.providerStatus == "Accessibility permission required")
+        #expect(appState.providerStatus == appState.copy.waitingForInput || appState.providerStatus == appState.copy.accessibilityPermissionRequired)
+    }
+
+    @MainActor
+    @Test func accessibilityOnboardingPromptOnlyTriggersOnceWhenPermissionMissing() throws {
+        let suiteName = "LiveTranslateAppTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defaults.removePersistentDomain(forName: suiteName)
+
+        let appState = AppState(defaults: defaults)
+
+        let firstAttempt = appState.shouldPromptAccessibilityOnLaunch()
+        let secondAttempt = appState.shouldPromptAccessibilityOnLaunch()
+
+        if appState.isAccessibilityTrusted {
+            #expect(firstAttempt == false)
+            #expect(secondAttempt == false)
+        } else {
+            #expect(firstAttempt == true)
+            #expect(secondAttempt == false)
+        }
+
+        defaults.removePersistentDomain(forName: suiteName)
     }
 }

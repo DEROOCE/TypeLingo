@@ -115,6 +115,128 @@ enum TargetLanguage: String, CaseIterable, Identifiable {
             return "Español"
         }
     }
+
+    var emptyTranslationPlaceholder: String {
+        switch self {
+        case .english:
+            return "Translation will appear here."
+        case .simplifiedChinese:
+            return "翻译结果会显示在这里。"
+        case .japanese:
+            return "翻訳結果がここに表示されます。"
+        case .korean:
+            return "번역 결과가 여기에 표시됩니다."
+        case .spanish:
+            return "La traduccion aparecera aqui."
+        }
+    }
+}
+
+enum InterfaceLanguage: String, CaseIterable, Identifiable, Codable {
+    case english = "en"
+    case simplifiedChinese = "zh-CN"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .english:
+            return "English"
+        case .simplifiedChinese:
+            return "简体中文"
+        }
+    }
+}
+
+struct LocalizedCopy {
+    let language: InterfaceLanguage
+
+    var generalTab: String { language == .simplifiedChinese ? "通用" : "General" }
+    var providersTab: String { language == .simplifiedChinese ? "Provider" : "Providers" }
+    var promptsTab: String { language == .simplifiedChinese ? "Prompt" : "Prompts" }
+    var diagnosticsTab: String { language == .simplifiedChinese ? "诊断" : "Diagnostics" }
+    var appTagline: String {
+        language == .simplifiedChinese
+            ? "一个面向 macOS 的实时字幕浮窗工具，监听当前聚焦输入框，边输入边翻译，适合演示、直播和双语沟通。"
+            : "A live subtitle overlay for macOS that watches the focused text field, translates as you type, and stays lightweight enough for calls, streams, and demos."
+    }
+    var accessibilityReady: String { language == .simplifiedChinese ? "辅助功能已开启" : "Accessibility Ready" }
+    var accessibilityNeeded: String { language == .simplifiedChinese ? "需要辅助功能权限" : "Accessibility Needed" }
+    var quickControlsTitle: String { language == .simplifiedChinese ? "快捷控制" : "Quick Controls" }
+    var quickControlsSubtitle: String { language == .simplifiedChinese ? "高频使用的浮窗和快捷键设置。" : "High-frequency controls for the overlay and wake shortcut." }
+    var interfaceLanguage: String { language == .simplifiedChinese ? "界面语言" : "Interface Language" }
+    var interfaceLanguageDetail: String { language == .simplifiedChinese ? "切换设置面板和浮窗关键文案的显示语言。" : "Switch the settings panel and overlay UI language." }
+    var targetLanguage: String { language == .simplifiedChinese ? "目标语言" : "Target Language" }
+    var targetLanguageDetail: String { language == .simplifiedChinese ? "所有捕获到的文本都会翻译成这个语言。" : "All captured text will be translated into this language." }
+    var overlay: String { language == .simplifiedChinese ? "字幕浮窗" : "Overlay" }
+    var overlayDetail: String { language == .simplifiedChinese ? "如果浮窗被关闭，可以手动重新显示。" : "Show the subtitle overlay manually if it was closed." }
+    var showOverlay: String { language == .simplifiedChinese ? "显示浮窗" : "Show Overlay" }
+    var wakeShortcutHint: String { language == .simplifiedChinese ? "也可以使用唤醒快捷键。" : "You can also use the wake shortcut." }
+    var wakeShortcut: String { language == .simplifiedChinese ? "唤醒快捷键" : "Wake Shortcut" }
+    var wakeShortcutDetail: String { language == .simplifiedChinese ? "按一次显示浮窗，再按一次隐藏浮窗。" : "Press once to show the subtitle overlay, press again to hide it." }
+    var currentShortcutPrefix: String { language == .simplifiedChinese ? "当前快捷键：" : "Current shortcut:" }
+    var backgroundOpacity: String { language == .simplifiedChinese ? "背景透明度" : "Background Opacity" }
+    var subtitleSize: String { language == .simplifiedChinese ? "字幕字号" : "Subtitle Size" }
+    var accessibilityPermissionTitle: String { language == .simplifiedChinese ? "辅助功能权限" : "Accessibility Permission" }
+    var accessibilityPermissionSubtitle: String { language == .simplifiedChinese ? "读取其他应用中当前聚焦输入控件所必需的权限。" : "Required for reading the focused input control from other apps." }
+    var accessibilityEnabled: String { language == .simplifiedChinese ? "辅助功能访问已开启" : "Accessibility access enabled" }
+    var accessibilityRequired: String { language == .simplifiedChinese ? "需要开启辅助功能访问" : "Accessibility access required" }
+    var accessibilityExplainer: String { language == .simplifiedChinese ? "没有辅助功能权限，应用无法读取其他应用里的输入变化，浮窗会保持空闲状态。" : "Without Accessibility permission, the app cannot see text changes in other applications, so the overlay will stay idle." }
+    var requestPermission: String { language == .simplifiedChinese ? "请求权限" : "Request Permission" }
+    var openSettings: String { language == .simplifiedChinese ? "打开设置" : "Open Settings" }
+    var settingsBackupTitle: String { language == .simplifiedChinese ? "设置备份" : "Settings Backup" }
+    var settingsBackupSubtitle: String { language == .simplifiedChinese ? "导出当前配置到 JSON 文件，或在另一台机器上导入。" : "Export your current setup to a JSON file, or import it on another machine." }
+    var exportSettings: String { language == .simplifiedChinese ? "导出设置" : "Export Settings" }
+    var exportWithAPIKeys: String { language == .simplifiedChinese ? "导出并包含 API Key" : "Export With API Keys" }
+    var importSettings: String { language == .simplifiedChinese ? "导入设置" : "Import Settings" }
+    var exportSettingsDetail: String { language == .simplifiedChinese ? "默认导出不包含 API key。只有在你信任目标设备时，才使用“导出并包含 API Key”。" : "Default export excludes API keys. Use `Export With API Keys` only when you trust the destination machine." }
+    var translationProviderTitle: String { language == .simplifiedChinese ? "翻译 Provider" : "Translation Provider" }
+    var translationProviderSubtitle: String { language == .simplifiedChinese ? "在 Google Web 和 OpenAI-compatible profile 之间切换。" : "Switch between Google Web and your OpenAI-compatible profiles." }
+    var activeProvider: String { language == .simplifiedChinese ? "当前 Provider" : "Active Provider" }
+    var testing: String { language == .simplifiedChinese ? "测试中..." : "Testing..." }
+    var testCurrentProvider: String { language == .simplifiedChinese ? "测试当前 Provider" : "Test Current Provider" }
+    var apiProfilesTitle: String { language == .simplifiedChinese ? "API Profiles" : "API Profiles" }
+    var apiProfilesSubtitle: String { language == .simplifiedChinese ? "这些 profile 仅在使用 OpenAI-compatible provider 时生效。" : "These profiles are used only when the provider is OpenAI-Compatible." }
+    var activeAPIProfile: String { language == .simplifiedChinese ? "当前 API Profile" : "Active API Profile" }
+    var activeAPIProfileDetail: String { language == .simplifiedChinese ? "选择当前生效的 LLM 接口配置。" : "Choose which LLM endpoint is currently active." }
+    var addAPIProfile: String { language == .simplifiedChinese ? "新增 API Profile" : "Add API Profile" }
+    var duplicate: String { language == .simplifiedChinese ? "复制" : "Duplicate" }
+    var remove: String { language == .simplifiedChinese ? "删除" : "Remove" }
+    var selectedAPIProfile: String { language == .simplifiedChinese ? "当前 API Profile 配置" : "Selected API Profile" }
+    var profileName: String { language == .simplifiedChinese ? "Profile 名称" : "Profile Name" }
+    var apiKey: String { language == .simplifiedChinese ? "API Key" : "API Key" }
+    var baseURL: String { language == .simplifiedChinese ? "Base URL" : "Base URL" }
+    var model: String { language == .simplifiedChinese ? "模型" : "Model" }
+    var testSelectedAPIProfile: String { language == .simplifiedChinese ? "测试当前 API Profile" : "Test Selected API Profile" }
+    var promptProfilesTitle: String { language == .simplifiedChinese ? "Prompt Profiles" : "Prompt Profiles" }
+    var promptProfilesSubtitle: String { language == .simplifiedChinese ? "为不同字幕翻译场景保留独立的 system prompt。" : "Keep separate system prompts for different subtitle translation scenarios." }
+    var activePrompt: String { language == .simplifiedChinese ? "当前 Prompt" : "Active Prompt" }
+    var activePromptDetail: String { language == .simplifiedChinese ? "所选 profile 会用于 OpenAI-compatible 翻译。" : "The selected profile will be used for OpenAI-compatible translation." }
+    var addPromptProfile: String { language == .simplifiedChinese ? "新增 Prompt Profile" : "Add Prompt Profile" }
+    var resetToPreset: String { language == .simplifiedChinese ? "恢复预设" : "Reset to Preset" }
+    var promptProfileName: String { language == .simplifiedChinese ? "Prompt Profile 名称" : "Prompt Profile Name" }
+    var promptPlaceholderHelp: String { language == .simplifiedChinese ? "可使用 `{{target_language}}` 作为目标语言占位符。保留多个 prompt profile，便于在会议、直播和通用翻译场景间切换。" : "Use `{{target_language}}` as a placeholder for the selected target language. Keeping multiple prompt profiles makes it easier to switch between meeting, streaming, and general translation styles." }
+    var liveStateTitle: String { language == .simplifiedChinese ? "实时状态" : "Live State" }
+    var liveStateSubtitle: String { language == .simplifiedChinese ? "查看应用当前读取和翻译到的内容。" : "See what the app is currently reading and translating." }
+    var focusedApp: String { language == .simplifiedChinese ? "当前应用" : "Focused App" }
+    var focusedRole: String { language == .simplifiedChinese ? "当前角色" : "Focused Role" }
+    var activePromptCard: String { language == .simplifiedChinese ? "当前 Prompt" : "Active Prompt" }
+    var status: String { language == .simplifiedChinese ? "状态" : "Status" }
+    var capturedText: String { language == .simplifiedChinese ? "捕获文本" : "Captured Text" }
+    var translatedText: String { language == .simplifiedChinese ? "翻译结果" : "Translated Text" }
+    var noCapturedText: String { language == .simplifiedChinese ? "还没有捕获到实时文本。" : "No live text captured yet." }
+    var noTranslationYet: String { language == .simplifiedChinese ? "还没有翻译结果。" : "No translation yet." }
+    var prototypeNotesTitle: String { language == .simplifiedChinese ? "原型说明" : "Prototype Notes" }
+    var prototypeNotesSubtitle: String { language == .simplifiedChinese ? "当前 Accessibility 方案已知的限制。" : "Known limitations of the current Accessibility-based approach." }
+    var noteIME: String { language == .simplifiedChinese ? "Accessibility 无法稳定提供中文 IME 的组合态文本。通常只能拿到已上屏文本，而不是候选中的中间态字符串。" : "Chinese IME composition text is not guaranteed through Accessibility. You usually get committed text, not the in-progress candidate string." }
+    var noteSecure: String { language == .simplifiedChinese ? "密码框和安全输入框会被有意忽略。" : "Password and secure fields are intentionally ignored." }
+    var noteNearCaret: String { language == .simplifiedChinese ? "大型编辑器只会截取光标附近的文本，避免每次按键都整篇重译导致浮窗抖动。" : "Large editors are truncated to the text near the caret so the overlay stays stable instead of retranslating an entire document on every keystroke." }
+    var noteIMEPath: String { language == .simplifiedChinese ? "长期方案是基于 InputMethodKit 的真正输入法扩展。" : "The long-term upgrade path is a true IME extension built with InputMethodKit." }
+    var waitingForInput: String { language == .simplifiedChinese ? "等待输入" : "Waiting for input" }
+    var accessibilityPermissionRequired: String { language == .simplifiedChinese ? "需要辅助功能权限" : "Accessibility permission required" }
+    var accessibilityEnabledStatus: String { language == .simplifiedChinese ? "辅助功能已开启" : "Accessibility enabled" }
+    var grantAccessibilityInSettings: String { language == .simplifiedChinese ? "请在系统设置中开启辅助功能权限" : "Grant Accessibility permission in System Settings" }
+    var grantPermissionOverlay: String { language == .simplifiedChinese ? "授予权限" : "Grant Permission" }
 }
 
 enum ShortcutKey: String, CaseIterable, Identifiable, Codable {
@@ -255,6 +377,23 @@ enum ShortcutModifier: String, CaseIterable, Identifiable {
             return "Shift"
         }
     }
+
+    func localizedDisplayName(language: InterfaceLanguage) -> String {
+        guard language == .simplifiedChinese else {
+            return displayName
+        }
+
+        switch self {
+        case .control:
+            return "Control"
+        case .option:
+            return "Option"
+        case .command:
+            return "Command"
+        case .shift:
+            return "Shift"
+        }
+    }
 }
 
 struct WakeShortcut: Codable, Equatable {
@@ -295,6 +434,17 @@ struct WakeShortcut: Codable, Equatable {
             includesOption ? ShortcutModifier.option.displayName : nil,
             includesCommand ? ShortcutModifier.command.displayName : nil,
             includesShift ? ShortcutModifier.shift.displayName : nil,
+            key.displayName
+        ]
+        return parts.compactMap { $0 }.joined(separator: " + ")
+    }
+
+    func localizedDisplayName(language: InterfaceLanguage) -> String {
+        let parts = [
+            includesControl ? ShortcutModifier.control.localizedDisplayName(language: language) : nil,
+            includesOption ? ShortcutModifier.option.localizedDisplayName(language: language) : nil,
+            includesCommand ? ShortcutModifier.command.localizedDisplayName(language: language) : nil,
+            includesShift ? ShortcutModifier.shift.localizedDisplayName(language: language) : nil,
             key.displayName
         ]
         return parts.compactMap { $0 }.joined(separator: " + ")
@@ -368,6 +518,7 @@ final class AppState: ObservableObject {
     }
 
     private enum DefaultsKey {
+        static let interfaceLanguage = "LiveTranslate.InterfaceLanguage"
         static let selectedProvider = "LiveTranslate.SelectedProvider"
         static let selectedProviderProfileID = "LiveTranslate.SelectedProviderProfileID"
         static let selectedPromptProfileID = "LiveTranslate.SelectedPromptProfileID"
@@ -377,6 +528,7 @@ final class AppState: ObservableObject {
         static let subtitleFontSize = "LiveTranslate.SubtitleFontSize"
         static let overlayOpacity = "LiveTranslate.OverlayOpacity"
         static let wakeShortcut = "LiveTranslate.WakeShortcut"
+        static let didPromptAccessibilityOnboarding = "LiveTranslate.DidPromptAccessibilityOnboarding"
 
         // Legacy single-config keys for migration.
         static let legacyOpenAIAPIKey = "LiveTranslate.OpenAIAPIKey"
@@ -389,6 +541,12 @@ final class AppState: ObservableObject {
     @Published var sourceText: String
     @Published var translatedText: String
     @Published var providerStatus: String
+    @Published var interfaceLanguage: InterfaceLanguage {
+        didSet {
+            defaults.set(interfaceLanguage.rawValue, forKey: DefaultsKey.interfaceLanguage)
+            providerStatus = isAccessibilityTrusted ? copy.waitingForInput : copy.accessibilityPermissionRequired
+        }
+    }
     @Published var selectedProvider: TranslationProviderKind {
         didSet {
             defaults.set(selectedProvider.rawValue, forKey: DefaultsKey.selectedProvider)
@@ -457,11 +615,13 @@ final class AppState: ObservableObject {
 
         let loadedProviderProfiles = Self.loadProviderProfiles(from: defaults)
         let loadedPromptProfiles = Self.loadPromptProfiles(from: defaults)
+        let savedInterfaceLanguage = defaults.string(forKey: DefaultsKey.interfaceLanguage) ?? InterfaceLanguage.english.rawValue
 
         self.isAccessibilityTrusted = AccessibilityAuthorizer.isTrusted(prompt: false)
         self.sourceText = ""
         self.translatedText = ""
-        self.providerStatus = "Waiting for Accessibility permission"
+        self.providerStatus = ""
+        self.interfaceLanguage = InterfaceLanguage(rawValue: savedInterfaceLanguage) ?? .english
 
         let selectedProviderRaw = defaults.string(forKey: DefaultsKey.selectedProvider) ?? TranslationProviderKind.googleWeb.rawValue
         self.selectedProvider = TranslationProviderKind(rawValue: selectedProviderRaw) ?? .googleWeb
@@ -490,10 +650,11 @@ final class AppState: ObservableObject {
         self.subtitleFontSize = savedSubtitleSize == 0 ? 30 : savedSubtitleSize
         self.wakeShortcut = Self.loadWakeShortcut(from: defaults)
 
-        self.providerTestStatus = "Not tested"
+        self.providerTestStatus = (InterfaceLanguage(rawValue: savedInterfaceLanguage) ?? .english) == .simplifiedChinese ? "尚未测试" : "Not tested"
         self.isTestingProvider = false
-        self.settingsTransferStatus = "No import or export yet"
+        self.settingsTransferStatus = (InterfaceLanguage(rawValue: savedInterfaceLanguage) ?? .english) == .simplifiedChinese ? "还没有导入或导出记录" : "No import or export yet"
         self.errorMessage = nil
+        self.providerStatus = isAccessibilityTrusted ? copy.waitingForInput : copy.accessibilityPermissionRequired
 
         saveProviderProfiles()
         savePromptProfiles()
@@ -507,7 +668,7 @@ final class AppState: ObservableObject {
     }
 
     var wakeShortcutDisplayName: String {
-        wakeShortcut.displayName
+        wakeShortcut.localizedDisplayName(language: interfaceLanguage)
     }
 
     var currentPromptProfile: PromptProfile? {
@@ -523,11 +684,30 @@ final class AppState: ObservableObject {
         }
     }
 
+    var copy: LocalizedCopy {
+        LocalizedCopy(language: interfaceLanguage)
+    }
+
     func requestAccessibilityPermission() {
         isAccessibilityTrusted = AccessibilityAuthorizer.isTrusted(prompt: true)
         providerStatus = isAccessibilityTrusted
-            ? "Accessibility enabled"
-            : "Grant Accessibility permission in System Settings"
+            ? copy.accessibilityEnabledStatus
+            : copy.grantAccessibilityInSettings
+    }
+
+    func shouldPromptAccessibilityOnLaunch() -> Bool {
+        guard !isAccessibilityTrusted else {
+            defaults.set(true, forKey: DefaultsKey.didPromptAccessibilityOnboarding)
+            return false
+        }
+
+        let hasPromptedBefore = defaults.bool(forKey: DefaultsKey.didPromptAccessibilityOnboarding)
+        guard !hasPromptedBefore else {
+            return false
+        }
+
+        defaults.set(true, forKey: DefaultsKey.didPromptAccessibilityOnboarding)
+        return true
     }
 
     func openAccessibilitySettings() {
@@ -537,7 +717,7 @@ final class AppState: ObservableObject {
     func updateAccessibilityTrust(_ trusted: Bool) {
         isAccessibilityTrusted = trusted
         if !trusted {
-            providerStatus = "Accessibility permission required"
+            providerStatus = copy.accessibilityPermissionRequired
             translatedText = ""
         }
     }
@@ -557,7 +737,7 @@ final class AppState: ObservableObject {
 
     func clearCapturedText() {
         guard !sourceText.isEmpty || !translatedText.isEmpty || errorMessage != nil else {
-            providerStatus = isAccessibilityTrusted ? "Waiting for input" : "Accessibility permission required"
+            providerStatus = isAccessibilityTrusted ? copy.waitingForInput : copy.accessibilityPermissionRequired
             return
         }
 
@@ -565,7 +745,7 @@ final class AppState: ObservableObject {
         sourceText = ""
         translatedText = ""
         errorMessage = nil
-        providerStatus = isAccessibilityTrusted ? "Waiting for input" : "Accessibility permission required"
+        providerStatus = isAccessibilityTrusted ? copy.waitingForInput : copy.accessibilityPermissionRequired
     }
 
     func chooseGoogleProvider() {
@@ -588,10 +768,10 @@ final class AppState: ObservableObject {
 
     func exportSettings(includeSecrets: Bool = false) {
         let panel = NSSavePanel()
-        panel.title = "Export TypeLingo Settings"
+        panel.title = interfaceLanguage == .simplifiedChinese ? "导出 TypeLingo 设置" : "Export TypeLingo Settings"
         panel.message = includeSecrets
-            ? "Save all current settings, including API keys, to a JSON file."
-            : "Save current settings to a JSON file without API keys."
+            ? (interfaceLanguage == .simplifiedChinese ? "将当前所有设置（包含 API key）保存为 JSON 文件。" : "Save all current settings, including API keys, to a JSON file.")
+            : (interfaceLanguage == .simplifiedChinese ? "将当前设置保存为不包含 API key 的 JSON 文件。" : "Save current settings to a JSON file without API keys.")
         panel.nameFieldStringValue = includeSecrets
             ? "typelingo-settings-with-secrets.json"
             : "typelingo-settings.json"
@@ -599,7 +779,7 @@ final class AppState: ObservableObject {
         panel.canCreateDirectories = true
 
         guard panel.runModal() == .OK, let url = panel.url else {
-            settingsTransferStatus = "Export cancelled"
+            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "已取消导出" : "Export cancelled"
             return
         }
 
@@ -624,24 +804,24 @@ final class AppState: ObservableObject {
             let data = try encoder.encode(payload)
             try data.write(to: url, options: .atomic)
             settingsTransferStatus = includeSecrets
-                ? "Exported settings with API keys to \(url.lastPathComponent)"
-                : "Exported settings to \(url.lastPathComponent)"
+                ? (interfaceLanguage == .simplifiedChinese ? "已导出包含 API key 的设置到 \(url.lastPathComponent)" : "Exported settings with API keys to \(url.lastPathComponent)")
+                : (interfaceLanguage == .simplifiedChinese ? "已导出设置到 \(url.lastPathComponent)" : "Exported settings to \(url.lastPathComponent)")
         } catch {
-            settingsTransferStatus = "Export failed: \(error.localizedDescription)"
+            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "导出失败：\(error.localizedDescription)" : "Export failed: \(error.localizedDescription)"
         }
     }
 
     func importSettings() {
         let panel = NSOpenPanel()
-        panel.title = "Import TypeLingo Settings"
-        panel.message = "Import provider, prompt, overlay, and shortcut settings from a JSON file."
+        panel.title = interfaceLanguage == .simplifiedChinese ? "导入 TypeLingo 设置" : "Import TypeLingo Settings"
+        panel.message = interfaceLanguage == .simplifiedChinese ? "从 JSON 文件导入 provider、prompt、浮窗和快捷键设置。" : "Import provider, prompt, overlay, and shortcut settings from a JSON file."
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
 
         guard panel.runModal() == .OK, let url = panel.url else {
-            settingsTransferStatus = "Import cancelled"
+            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "已取消导入" : "Import cancelled"
             return
         }
 
@@ -651,9 +831,9 @@ final class AppState: ObservableObject {
             decoder.dateDecodingStrategy = .iso8601
             let payload = try decoder.decode(SettingsTransferBundle.self, from: data)
             applyImportedSettings(payload)
-            settingsTransferStatus = "Imported settings from \(url.lastPathComponent)"
+            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "已从 \(url.lastPathComponent) 导入设置" : "Imported settings from \(url.lastPathComponent)"
         } catch {
-            settingsTransferStatus = "Import failed: \(error.localizedDescription)"
+            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "导入失败：\(error.localizedDescription)" : "Import failed: \(error.localizedDescription)"
         }
     }
 
@@ -806,7 +986,7 @@ final class AppState: ObservableObject {
         }
 
         isTestingProvider = true
-        providerTestStatus = "Testing..."
+        providerTestStatus = copy.testing
 
         let config = TranslationConfiguration(
             openAIProfile: providerProfiles.first(where: { $0.id == providerProfileID }),
@@ -841,7 +1021,7 @@ final class AppState: ObservableObject {
         let trimmed = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             translatedText = ""
-            providerStatus = isAccessibilityTrusted ? "Waiting for input" : "Accessibility permission required"
+            providerStatus = isAccessibilityTrusted ? copy.waitingForInput : copy.accessibilityPermissionRequired
             errorMessage = nil
             return
         }
@@ -1167,6 +1347,8 @@ struct ControlPanelView: View {
     @ObservedObject var appState: AppState
     @State private var selectedTab: SettingsPanelTab = .general
 
+    private var copy: LocalizedCopy { appState.copy }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -1194,13 +1376,13 @@ struct ControlPanelView: View {
             Text("TypeLingo")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
 
-            Text("A live subtitle overlay for macOS that watches the focused text field, translates as you type, and stays lightweight enough for calls, streams, and demos.")
+            Text(copy.appTagline)
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
 
             HStack(spacing: 10) {
                 SummaryPill(
-                    title: appState.isAccessibilityTrusted ? "Accessibility Ready" : "Accessibility Needed",
+                    title: appState.isAccessibilityTrusted ? copy.accessibilityReady : copy.accessibilityNeeded,
                     symbolName: appState.isAccessibilityTrusted ? "checkmark.shield" : "exclamationmark.triangle",
                     tint: appState.isAccessibilityTrusted ? .green : .orange
                 )
@@ -1240,10 +1422,19 @@ struct ControlPanelView: View {
     private var tabPicker: some View {
         Picker("", selection: $selectedTab) {
             ForEach(SettingsPanelTab.allCases) { tab in
-                Label(tab.title, systemImage: tab.symbolName).tag(tab)
+                Label(localizedTabTitle(tab), systemImage: tab.symbolName).tag(tab)
             }
         }
         .pickerStyle(.segmented)
+    }
+
+    private func localizedTabTitle(_ tab: SettingsPanelTab) -> String {
+        switch tab {
+        case .general: return copy.generalTab
+        case .providers: return copy.providersTab
+        case .prompts: return copy.promptsTab
+        case .diagnostics: return copy.diagnosticsTab
+        }
     }
 
     @ViewBuilder
@@ -1263,13 +1454,24 @@ struct ControlPanelView: View {
     private var generalContent: some View {
         VStack(alignment: .leading, spacing: 18) {
             settingsCard(
-                title: "Quick Controls",
-                subtitle: "High-frequency controls for the overlay and wake shortcut."
+                title: copy.quickControlsTitle,
+                subtitle: copy.quickControlsSubtitle
             ) {
                 Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
                     GridRow {
-                        settingLabel("Target Language", detail: "All captured text will be translated into this language.")
-                        Picker("Target Language", selection: $appState.targetLanguage) {
+                        settingLabel(copy.interfaceLanguage, detail: copy.interfaceLanguageDetail)
+                        Picker(copy.interfaceLanguage, selection: $appState.interfaceLanguage) {
+                            ForEach(InterfaceLanguage.allCases) { language in
+                                Text(language.displayName).tag(language)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(maxWidth: 220, alignment: .leading)
+                    }
+
+                    GridRow {
+                        settingLabel(copy.targetLanguage, detail: copy.targetLanguageDetail)
+                        Picker(copy.targetLanguage, selection: $appState.targetLanguage) {
                             ForEach(TargetLanguage.allCases) { language in
                                 Text(language.displayName).tag(language)
                             }
@@ -1279,14 +1481,14 @@ struct ControlPanelView: View {
                     }
 
                     GridRow {
-                        settingLabel("Overlay", detail: "Show the subtitle overlay manually if it was closed.")
+                        settingLabel(copy.overlay, detail: copy.overlayDetail)
                         HStack(spacing: 12) {
-                            Button("Show Overlay") {
+                            Button(copy.showOverlay) {
                                 NotificationCenter.default.post(name: .overlayShowRequested, object: nil)
                             }
                             .buttonStyle(.borderedProminent)
 
-                            Text("You can also use the wake shortcut.")
+                            Text(copy.wakeShortcutHint)
                                 .font(.system(size: 12))
                                 .foregroundStyle(.secondary)
                         }
@@ -1298,9 +1500,9 @@ struct ControlPanelView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Wake Shortcut")
+                            Text(copy.wakeShortcut)
                                 .font(.system(size: 16, weight: .semibold))
-                            Text("Press once to show the subtitle overlay, press again to hide it.")
+                            Text(copy.wakeShortcutDetail)
                                 .font(.system(size: 12))
                                 .foregroundStyle(.secondary)
                         }
@@ -1314,7 +1516,7 @@ struct ControlPanelView: View {
 
                     ShortcutRecorderCard(appState: appState)
 
-                    Text("Current shortcut: \(appState.wakeShortcutDisplayName)")
+                    Text("\(copy.currentShortcutPrefix) \(appState.wakeShortcutDisplayName)")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                 }
@@ -1323,14 +1525,14 @@ struct ControlPanelView: View {
 
                 VStack(alignment: .leading, spacing: 14) {
                     sliderRow(
-                        title: "Background Opacity",
+                        title: copy.backgroundOpacity,
                         value: "\(Int(appState.overlayOpacity * 100))%"
                     ) {
                         Slider(value: $appState.overlayOpacity, in: 0.22...0.96)
                     }
 
                     sliderRow(
-                        title: "Subtitle Size",
+                        title: copy.subtitleSize,
                         value: "\(Int(appState.subtitleFontSize)) pt"
                     ) {
                         Slider(value: $appState.subtitleFontSize, in: 22...52, step: 1)
@@ -1339,8 +1541,8 @@ struct ControlPanelView: View {
             }
 
             settingsCard(
-                title: "Accessibility Permission",
-                subtitle: "Required for reading the focused input control from other apps."
+                title: copy.accessibilityPermissionTitle,
+                subtitle: copy.accessibilityPermissionSubtitle
             ) {
                 HStack(alignment: .top, spacing: 14) {
                     Image(systemName: appState.isAccessibilityTrusted ? "checkmark.shield.fill" : "exclamationmark.triangle.fill")
@@ -1349,20 +1551,20 @@ struct ControlPanelView: View {
                         .frame(width: 24)
 
                     VStack(alignment: .leading, spacing: 10) {
-                        Text(appState.isAccessibilityTrusted ? "Accessibility access enabled" : "Accessibility access required")
+                        Text(appState.isAccessibilityTrusted ? copy.accessibilityEnabled : copy.accessibilityRequired)
                             .font(.system(size: 16, weight: .semibold))
 
-                        Text("Without Accessibility permission, the app cannot see text changes in other applications, so the overlay will stay idle.")
+                        Text(copy.accessibilityExplainer)
                             .font(.system(size: 13))
                             .foregroundStyle(.secondary)
 
                         HStack(spacing: 12) {
-                            Button("Request Permission") {
+                            Button(copy.requestPermission) {
                                 appState.requestAccessibilityPermission()
                             }
                             .buttonStyle(.borderedProminent)
 
-                            Button("Open Settings") {
+                            Button(copy.openSettings) {
                                 appState.openAccessibilitySettings()
                             }
                             .buttonStyle(.bordered)
@@ -1372,27 +1574,27 @@ struct ControlPanelView: View {
             }
 
             settingsCard(
-                title: "Settings Backup",
-                subtitle: "Export your current setup to a JSON file, or import it on another machine."
+                title: copy.settingsBackupTitle,
+                subtitle: copy.settingsBackupSubtitle
             ) {
                 HStack(spacing: 12) {
-                    Button("Export Settings") {
+                    Button(copy.exportSettings) {
                         appState.exportSettings()
                     }
                     .buttonStyle(.borderedProminent)
 
-                    Button("Export With API Keys") {
+                    Button(copy.exportWithAPIKeys) {
                         appState.exportSettings(includeSecrets: true)
                     }
                     .buttonStyle(.bordered)
 
-                    Button("Import Settings") {
+                    Button(copy.importSettings) {
                         appState.importSettings()
                     }
                     .buttonStyle(.bordered)
                 }
 
-                Text("Default export excludes API keys. Use `Export With API Keys` only when you trust the destination machine.")
+                Text(copy.exportSettingsDetail)
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
 
@@ -1407,17 +1609,17 @@ struct ControlPanelView: View {
     private var providersContent: some View {
         VStack(alignment: .leading, spacing: 18) {
             settingsCard(
-                title: "Translation Provider",
-                subtitle: "Switch between Google Web and your OpenAI-compatible profiles."
+                title: copy.translationProviderTitle,
+                subtitle: copy.translationProviderSubtitle
             ) {
-                Picker("Active Provider", selection: $appState.selectedProvider) {
+                Picker(copy.activeProvider, selection: $appState.selectedProvider) {
                     Text(TranslationProviderKind.googleWeb.displayName).tag(TranslationProviderKind.googleWeb)
                     Text(TranslationProviderKind.openAICompatible.displayName).tag(TranslationProviderKind.openAICompatible)
                 }
                 .pickerStyle(.segmented)
 
                 HStack(spacing: 12) {
-                    Button(appState.isTestingProvider ? "Testing..." : "Test Current Provider") {
+                    Button(appState.isTestingProvider ? copy.testing : copy.testCurrentProvider) {
                         appState.testCurrentProvider()
                     }
                     .disabled(appState.isTestingProvider)
@@ -1431,13 +1633,13 @@ struct ControlPanelView: View {
             }
 
             settingsCard(
-                title: "API Profiles",
-                subtitle: "These profiles are used only when the provider is OpenAI-Compatible."
+                title: copy.apiProfilesTitle,
+                subtitle: copy.apiProfilesSubtitle
             ) {
                 Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
                     GridRow {
-                        settingLabel("Active API Profile", detail: "Choose which LLM endpoint is currently active.")
-                        Picker("Active API Profile", selection: $appState.selectedProviderProfileID) {
+                        settingLabel(copy.activeAPIProfile, detail: copy.activeAPIProfileDetail)
+                        Picker(copy.activeAPIProfile, selection: $appState.selectedProviderProfileID) {
                             ForEach(appState.providerProfiles) { profile in
                                 Text(profile.name).tag(profile.id)
                             }
@@ -1448,13 +1650,13 @@ struct ControlPanelView: View {
                 }
 
                 HStack(spacing: 10) {
-                    Button("Add API Profile") {
+                    Button(copy.addAPIProfile) {
                         appState.addProviderProfile()
                     }
-                    Button("Duplicate") {
+                    Button(copy.duplicate) {
                         appState.duplicateSelectedProviderProfile()
                     }
-                    Button("Remove") {
+                    Button(copy.remove) {
                         appState.removeSelectedProviderProfile()
                     }
                     .disabled(appState.providerProfiles.count <= 1)
@@ -1464,22 +1666,22 @@ struct ControlPanelView: View {
                 Divider()
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Selected API Profile")
+                    Text(copy.selectedAPIProfile)
                         .font(.system(size: 16, weight: .semibold))
 
-                    TextField("Profile Name", text: providerProfileBinding(\.name))
+                    TextField(copy.profileName, text: providerProfileBinding(\.name))
                         .textFieldStyle(.roundedBorder)
 
-                    SecureField("API Key", text: providerProfileBinding(\.apiKey))
+                    SecureField(copy.apiKey, text: providerProfileBinding(\.apiKey))
                         .textFieldStyle(.roundedBorder)
 
-                    TextField("Base URL", text: providerProfileBinding(\.baseURL))
+                    TextField(copy.baseURL, text: providerProfileBinding(\.baseURL))
                         .textFieldStyle(.roundedBorder)
 
-                    TextField("Model", text: providerProfileBinding(\.model))
+                    TextField(copy.model, text: providerProfileBinding(\.model))
                         .textFieldStyle(.roundedBorder)
 
-                    Button("Test Selected API Profile") {
+                    Button(copy.testSelectedAPIProfile) {
                         appState.testSelectedLLMProfile()
                     }
                     .disabled(appState.isTestingProvider)
@@ -1491,13 +1693,13 @@ struct ControlPanelView: View {
 
     private var promptsContent: some View {
         settingsCard(
-            title: "Prompt Profiles",
-            subtitle: "Keep separate system prompts for different subtitle translation scenarios."
+            title: copy.promptProfilesTitle,
+            subtitle: copy.promptProfilesSubtitle
         ) {
             Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
                 GridRow {
-                    settingLabel("Active Prompt", detail: "The selected profile will be used for OpenAI-compatible translation.")
-                    Picker("Active Prompt Profile", selection: $appState.selectedPromptProfileID) {
+                    settingLabel(copy.activePrompt, detail: copy.activePromptDetail)
+                    Picker(copy.activePrompt, selection: $appState.selectedPromptProfileID) {
                         ForEach(appState.promptProfiles) { profile in
                             Text(profile.name).tag(profile.id)
                         }
@@ -1508,24 +1710,24 @@ struct ControlPanelView: View {
             }
 
             HStack(spacing: 10) {
-                Button("Add Prompt Profile") {
+                Button(copy.addPromptProfile) {
                     appState.addPromptProfile()
                 }
-                Button("Duplicate") {
+                Button(copy.duplicate) {
                     appState.duplicateSelectedPromptProfile()
                 }
-                Button("Remove") {
+                Button(copy.remove) {
                     appState.removeSelectedPromptProfile()
                 }
                 .disabled(appState.promptProfiles.count <= 1)
                 Spacer()
-                Button("Reset to Preset") {
+                Button(copy.resetToPreset) {
                     appState.resetSelectedPromptProfileToPreset()
                 }
             }
             .buttonStyle(.bordered)
 
-            TextField("Prompt Profile Name", text: promptProfileBinding(\.name))
+            TextField(copy.promptProfileName, text: promptProfileBinding(\.name))
                 .textFieldStyle(.roundedBorder)
 
             TextEditor(text: promptProfileBinding(\.prompt))
@@ -1534,7 +1736,7 @@ struct ControlPanelView: View {
                 .padding(10)
                 .background(Color.black.opacity(0.05), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
-            Text("Use `{{target_language}}` as a placeholder for the selected target language. Keeping multiple prompt profiles makes it easier to switch between meeting, streaming, and general translation styles.")
+            Text(copy.promptPlaceholderHelp)
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
         }
@@ -1543,23 +1745,23 @@ struct ControlPanelView: View {
     private var diagnosticsContent: some View {
         VStack(alignment: .leading, spacing: 18) {
             settingsCard(
-                title: "Live State",
-                subtitle: "See what the app is currently reading and translating."
+                title: copy.liveStateTitle,
+                subtitle: copy.liveStateSubtitle
             ) {
                 LazyVGrid(columns: [
                     GridItem(.flexible(minimum: 160), spacing: 12),
                     GridItem(.flexible(minimum: 160), spacing: 12)
                 ], alignment: .leading, spacing: 12) {
-                    diagnosticValueCard("Focused App", value: appState.lastObservedApp)
-                    diagnosticValueCard("Focused Role", value: appState.lastObservedRole)
-                    diagnosticValueCard("Active Provider", value: appState.currentProviderDisplayName)
-                    diagnosticValueCard("Active Prompt", value: appState.currentPromptProfile?.name ?? "-")
-                    diagnosticValueCard("Status", value: appState.providerStatus)
-                    diagnosticValueCard("Wake Shortcut", value: appState.wakeShortcut.symbolDisplayName)
+                    diagnosticValueCard(copy.focusedApp, value: appState.lastObservedApp)
+                    diagnosticValueCard(copy.focusedRole, value: appState.lastObservedRole)
+                    diagnosticValueCard(copy.activeProvider, value: appState.currentProviderDisplayName)
+                    diagnosticValueCard(copy.activePromptCard, value: appState.currentPromptProfile?.name ?? "-")
+                    diagnosticValueCard(copy.status, value: appState.providerStatus)
+                    diagnosticValueCard(copy.wakeShortcut, value: appState.wakeShortcut.symbolDisplayName)
                 }
 
-                textPanel(title: "Captured Text", text: appState.sourceText.isEmpty ? "No live text captured yet." : appState.sourceText)
-                textPanel(title: "Translated Text", text: appState.translatedText.isEmpty ? "No translation yet." : appState.translatedText)
+                textPanel(title: copy.capturedText, text: appState.sourceText.isEmpty ? copy.noCapturedText : appState.sourceText)
+                textPanel(title: copy.translatedText, text: appState.translatedText.isEmpty ? copy.noTranslationYet : appState.translatedText)
 
                 if let errorMessage = appState.errorMessage {
                     Text(errorMessage)
@@ -1569,14 +1771,14 @@ struct ControlPanelView: View {
             }
 
             settingsCard(
-                title: "Prototype Notes",
-                subtitle: "Known limitations of the current Accessibility-based approach."
+                title: copy.prototypeNotesTitle,
+                subtitle: copy.prototypeNotesSubtitle
             ) {
                 VStack(alignment: .leading, spacing: 8) {
-                    diagnosticNote("Chinese IME composition text is not guaranteed through Accessibility. You usually get committed text, not the in-progress candidate string.")
-                    diagnosticNote("Password and secure fields are intentionally ignored.")
-                    diagnosticNote("Large editors are truncated to the text near the caret so the overlay stays stable instead of retranslating an entire document on every keystroke.")
-                    diagnosticNote("The long-term upgrade path is a true IME extension built with InputMethodKit.")
+                    diagnosticNote(copy.noteIME)
+                    diagnosticNote(copy.noteSecure)
+                    diagnosticNote(copy.noteNearCaret)
+                    diagnosticNote(copy.noteIMEPath)
                 }
             }
         }
@@ -1723,25 +1925,27 @@ struct ShortcutRecorderCard: View {
 
     @State private var isRecording = false
     @State private var monitor: Any?
-    @State private var hintText = "Click record, then press the new shortcut."
+    @State private var hintText = ""
+
+    private var copy: LocalizedCopy { appState.copy }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 if isRecording {
-                    Button("Recording...") {
+                    Button(copy.testing) {
                         toggleRecording()
                     }
                     .buttonStyle(.borderedProminent)
                 } else {
-                    Button("Record Shortcut") {
+                    Button(appState.interfaceLanguage == .simplifiedChinese ? "录制快捷键" : "Record Shortcut") {
                         toggleRecording()
                     }
                     .buttonStyle(.bordered)
                 }
 
                 if isRecording {
-                    Button("Cancel") {
+                    Button(appState.interfaceLanguage == .simplifiedChinese ? "取消" : "Cancel") {
                         stopRecording()
                     }
                     .buttonStyle(.bordered)
@@ -1762,6 +1966,11 @@ struct ShortcutRecorderCard: View {
         }
         .padding(14)
         .background(Color.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .onAppear {
+            if hintText.isEmpty {
+                hintText = idleHint
+            }
+        }
         .onDisappear {
             stopRecording()
         }
@@ -1778,7 +1987,7 @@ struct ShortcutRecorderCard: View {
     private func startRecording() {
         stopRecording()
         isRecording = true
-        hintText = "Press the new shortcut now. Press Escape to cancel."
+        hintText = recordingHint
         NotificationCenter.default.post(
             name: .wakeShortcutRecordingDidChange,
             object: nil,
@@ -1805,8 +2014,8 @@ struct ShortcutRecorderCard: View {
         }
 
         isRecording = false
-        if hintText == "Press the new shortcut now. Press Escape to cancel." {
-            hintText = "Click record, then press the new shortcut."
+        if hintText == recordingHint {
+            hintText = idleHint
         }
     }
 
@@ -1816,25 +2025,39 @@ struct ShortcutRecorderCard: View {
         }
 
         if event.keyCode == UInt16(kVK_Escape) {
-            hintText = "Recording cancelled."
+            hintText = appState.interfaceLanguage == .simplifiedChinese ? "已取消录制。" : "Recording cancelled."
             stopRecording()
             return nil
         }
 
         guard let shortcut = WakeShortcut.from(event: event) else {
-            hintText = "That key is not supported yet. Use letters or numbers."
+            hintText = appState.interfaceLanguage == .simplifiedChinese ? "暂不支持这个按键，请使用字母或数字键。" : "That key is not supported yet. Use letters or numbers."
             return nil
         }
 
         guard shortcut.hasAnyModifier else {
-            hintText = "Add at least one modifier key like Control, Command, Option, or Shift."
+            hintText = appState.interfaceLanguage == .simplifiedChinese ? "请至少加入一个修饰键，例如 Control、Command、Option 或 Shift。" : "Add at least one modifier key like Control, Command, Option, or Shift."
             return nil
         }
 
         appState.updateWakeShortcut(shortcut)
-        hintText = "Shortcut updated to \(shortcut.displayName)."
+        hintText = appState.interfaceLanguage == .simplifiedChinese
+            ? "快捷键已更新为 \(shortcut.localizedDisplayName(language: appState.interfaceLanguage))."
+            : "Shortcut updated to \(shortcut.localizedDisplayName(language: appState.interfaceLanguage))."
         stopRecording()
         return nil
+    }
+
+    private var idleHint: String {
+        appState.interfaceLanguage == .simplifiedChinese
+            ? "点击“录制快捷键”，然后按下新的快捷键组合。"
+            : "Click record, then press the new shortcut."
+    }
+
+    private var recordingHint: String {
+        appState.interfaceLanguage == .simplifiedChinese
+            ? "现在按下新的快捷键组合。按 Escape 可取消。"
+            : "Press the new shortcut now. Press Escape to cancel."
     }
 }
 
