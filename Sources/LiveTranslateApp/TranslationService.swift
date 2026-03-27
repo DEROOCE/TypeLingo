@@ -3,6 +3,26 @@ import Foundation
 struct TranslationService {
     let provider: TranslationProviderKind
     let configuration: TranslationConfiguration
+    let session: URLSession
+    let requestTimeout: TimeInterval?
+
+    init(
+        provider: TranslationProviderKind,
+        configuration: TranslationConfiguration,
+        session: URLSession = .shared,
+        requestTimeout: TimeInterval? = nil
+    ) {
+        self.provider = provider
+        self.configuration = configuration
+        self.session = session
+        self.requestTimeout = requestTimeout
+    }
+
+    private func applyTimeout(to request: inout URLRequest) {
+        if let requestTimeout {
+            request.timeoutInterval = requestTimeout
+        }
+    }
 
     func translate(
         text: String,
@@ -41,7 +61,10 @@ struct TranslationService {
             throw TranslationError.invalidRequest("Unable to build Google Translate URL")
         }
 
-        let (data, response) = try await URLSession.shared.data(from: url)
+        var request = URLRequest(url: url)
+        applyTimeout(to: &request)
+
+        let (data, response) = try await session.data(for: request)
         try validateHTTPResponse(response)
 
         guard let object = try JSONSerialization.jsonObject(with: data) as? [Any],
@@ -86,6 +109,7 @@ struct TranslationService {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        applyTimeout(to: &request)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
@@ -106,7 +130,7 @@ struct TranslationService {
 
         request.httpBody = try JSONEncoder().encode(body)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         try validateHTTPResponse(response)
 
         let decoded = try JSONDecoder().decode(ChatCompletionResponse.self, from: data)

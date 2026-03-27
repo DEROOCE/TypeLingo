@@ -26,219 +26,6 @@ Keep the output short, punchy, and easy to read quickly on screen.
 Return only the translated text.
 """
 
-struct CapturedTextSnapshot: Equatable {
-    let appName: String
-    let bundleIdentifier: String?
-    let role: String
-    let text: String
-}
-
-struct TranslationResult {
-    let translatedText: String
-    let latencyMs: Int
-}
-
-struct AIProviderProfile: Codable, Identifiable, Equatable {
-    var id: String
-    var name: String
-    var apiKey: String
-    var baseURL: String
-    var model: String
-
-    func sanitizedForStorage() -> AIProviderProfile {
-        var copy = self
-        copy.apiKey = ""
-        return copy
-    }
-
-    func sanitizedForExport(includeSecrets: Bool) -> AIProviderProfile {
-        includeSecrets ? self : sanitizedForStorage()
-    }
-}
-
-struct PromptProfile: Codable, Identifiable, Equatable {
-    var id: String
-    var name: String
-    var prompt: String
-}
-
-struct SettingsTransferBundle: Codable {
-    let schemaVersion: Int
-    let exportedAt: Date
-    let selectedProvider: String
-    let selectedProviderProfileID: String
-    let selectedPromptProfileID: String
-    let targetLanguage: String
-    let overlayOpacity: Double
-    let subtitleFontSize: Double
-    let wakeShortcut: WakeShortcut
-    let providerProfiles: [AIProviderProfile]
-    let promptProfiles: [PromptProfile]
-}
-
-enum TranslationProviderKind: String, CaseIterable, Identifiable {
-    case googleWeb
-    case openAICompatible
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .googleWeb:
-            return "Google Web"
-        case .openAICompatible:
-            return "OpenAI-Compatible"
-        }
-    }
-}
-
-enum TargetLanguage: String, CaseIterable, Identifiable {
-    case english = "en"
-    case simplifiedChinese = "zh-CN"
-    case japanese = "ja"
-    case korean = "ko"
-    case spanish = "es"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .english:
-            return "English"
-        case .simplifiedChinese:
-            return "简体中文"
-        case .japanese:
-            return "日本語"
-        case .korean:
-            return "한국어"
-        case .spanish:
-            return "Español"
-        }
-    }
-
-    var emptyTranslationPlaceholder: String {
-        switch self {
-        case .english:
-            return "Translation will appear here."
-        case .simplifiedChinese:
-            return "翻译结果会显示在这里。"
-        case .japanese:
-            return "翻訳結果がここに表示されます。"
-        case .korean:
-            return "번역 결과가 여기에 표시됩니다."
-        case .spanish:
-            return "La traduccion aparecera aqui."
-        }
-    }
-}
-
-enum InterfaceLanguage: String, CaseIterable, Identifiable, Codable {
-    case english = "en"
-    case simplifiedChinese = "zh-CN"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .english:
-            return "English"
-        case .simplifiedChinese:
-            return "简体中文"
-        }
-    }
-}
-
-struct LocalizedCopy {
-    let language: InterfaceLanguage
-
-    var generalTab: String { language == .simplifiedChinese ? "通用" : "General" }
-    var providersTab: String { language == .simplifiedChinese ? "Provider" : "Providers" }
-    var promptsTab: String { language == .simplifiedChinese ? "Prompt" : "Prompts" }
-    var diagnosticsTab: String { language == .simplifiedChinese ? "诊断" : "Diagnostics" }
-    var appTagline: String {
-        language == .simplifiedChinese
-            ? "一个面向 macOS 的实时字幕浮窗工具，监听当前聚焦输入框，边输入边翻译，适合演示、直播和双语沟通。"
-            : "A live subtitle overlay for macOS that watches the focused text field, translates as you type, and stays lightweight enough for calls, streams, and demos."
-    }
-    var accessibilityReady: String { language == .simplifiedChinese ? "辅助功能已开启" : "Accessibility Ready" }
-    var accessibilityNeeded: String { language == .simplifiedChinese ? "需要辅助功能权限" : "Accessibility Needed" }
-    var quickControlsTitle: String { language == .simplifiedChinese ? "快捷控制" : "Quick Controls" }
-    var quickControlsSubtitle: String { language == .simplifiedChinese ? "高频使用的浮窗和快捷键设置。" : "High-frequency controls for the overlay and wake shortcut." }
-    var interfaceLanguage: String { language == .simplifiedChinese ? "界面语言" : "Interface Language" }
-    var interfaceLanguageDetail: String { language == .simplifiedChinese ? "切换设置面板和浮窗关键文案的显示语言。" : "Switch the settings panel and overlay UI language." }
-    var targetLanguage: String { language == .simplifiedChinese ? "目标语言" : "Target Language" }
-    var targetLanguageDetail: String { language == .simplifiedChinese ? "所有捕获到的文本都会翻译成这个语言。" : "All captured text will be translated into this language." }
-    var overlay: String { language == .simplifiedChinese ? "字幕浮窗" : "Overlay" }
-    var overlayDetail: String { language == .simplifiedChinese ? "如果浮窗被关闭，可以手动重新显示。" : "Show the subtitle overlay manually if it was closed." }
-    var showOverlay: String { language == .simplifiedChinese ? "显示浮窗" : "Show Overlay" }
-    var wakeShortcutHint: String { language == .simplifiedChinese ? "也可以使用唤醒快捷键。" : "You can also use the wake shortcut." }
-    var wakeShortcut: String { language == .simplifiedChinese ? "唤醒快捷键" : "Wake Shortcut" }
-    var wakeShortcutDetail: String { language == .simplifiedChinese ? "按一次显示浮窗，再按一次隐藏浮窗。" : "Press once to show the subtitle overlay, press again to hide it." }
-    var currentShortcutPrefix: String { language == .simplifiedChinese ? "当前快捷键：" : "Current shortcut:" }
-    var backgroundOpacity: String { language == .simplifiedChinese ? "背景透明度" : "Background Opacity" }
-    var subtitleSize: String { language == .simplifiedChinese ? "字幕字号" : "Subtitle Size" }
-    var accessibilityPermissionTitle: String { language == .simplifiedChinese ? "辅助功能权限" : "Accessibility Permission" }
-    var accessibilityPermissionSubtitle: String { language == .simplifiedChinese ? "读取其他应用中当前聚焦输入控件所必需的权限。" : "Required for reading the focused input control from other apps." }
-    var accessibilityEnabled: String { language == .simplifiedChinese ? "辅助功能访问已开启" : "Accessibility access enabled" }
-    var accessibilityRequired: String { language == .simplifiedChinese ? "需要开启辅助功能访问" : "Accessibility access required" }
-    var accessibilityExplainer: String { language == .simplifiedChinese ? "没有辅助功能权限，应用无法读取其他应用里的输入变化，浮窗会保持空闲状态。" : "Without Accessibility permission, the app cannot see text changes in other applications, so the overlay will stay idle." }
-    var requestPermission: String { language == .simplifiedChinese ? "请求权限" : "Request Permission" }
-    var openSettings: String { language == .simplifiedChinese ? "打开设置" : "Open Settings" }
-    var settingsBackupTitle: String { language == .simplifiedChinese ? "设置备份" : "Settings Backup" }
-    var settingsBackupSubtitle: String { language == .simplifiedChinese ? "导出当前配置到 JSON 文件，或在另一台机器上导入。" : "Export your current setup to a JSON file, or import it on another machine." }
-    var exportSettings: String { language == .simplifiedChinese ? "导出设置" : "Export Settings" }
-    var exportWithAPIKeys: String { language == .simplifiedChinese ? "导出并包含 API Key" : "Export With API Keys" }
-    var importSettings: String { language == .simplifiedChinese ? "导入设置" : "Import Settings" }
-    var exportSettingsDetail: String { language == .simplifiedChinese ? "默认导出不包含 API key。只有在你信任目标设备时，才使用“导出并包含 API Key”。" : "Default export excludes API keys. Use `Export With API Keys` only when you trust the destination machine." }
-    var translationProviderTitle: String { language == .simplifiedChinese ? "翻译 Provider" : "Translation Provider" }
-    var translationProviderSubtitle: String { language == .simplifiedChinese ? "在 Google Web 和 OpenAI-compatible profile 之间切换。" : "Switch between Google Web and your OpenAI-compatible profiles." }
-    var activeProvider: String { language == .simplifiedChinese ? "当前 Provider" : "Active Provider" }
-    var testing: String { language == .simplifiedChinese ? "测试中..." : "Testing..." }
-    var testCurrentProvider: String { language == .simplifiedChinese ? "测试当前 Provider" : "Test Current Provider" }
-    var apiProfilesTitle: String { language == .simplifiedChinese ? "API Profiles" : "API Profiles" }
-    var apiProfilesSubtitle: String { language == .simplifiedChinese ? "这些 profile 仅在使用 OpenAI-compatible provider 时生效。" : "These profiles are used only when the provider is OpenAI-Compatible." }
-    var activeAPIProfile: String { language == .simplifiedChinese ? "当前 API Profile" : "Active API Profile" }
-    var activeAPIProfileDetail: String { language == .simplifiedChinese ? "选择当前生效的 LLM 接口配置。" : "Choose which LLM endpoint is currently active." }
-    var addAPIProfile: String { language == .simplifiedChinese ? "新增 API Profile" : "Add API Profile" }
-    var duplicate: String { language == .simplifiedChinese ? "复制" : "Duplicate" }
-    var remove: String { language == .simplifiedChinese ? "删除" : "Remove" }
-    var selectedAPIProfile: String { language == .simplifiedChinese ? "当前 API Profile 配置" : "Selected API Profile" }
-    var profileName: String { language == .simplifiedChinese ? "Profile 名称" : "Profile Name" }
-    var apiKey: String { language == .simplifiedChinese ? "API Key" : "API Key" }
-    var baseURL: String { language == .simplifiedChinese ? "Base URL" : "Base URL" }
-    var model: String { language == .simplifiedChinese ? "模型" : "Model" }
-    var testSelectedAPIProfile: String { language == .simplifiedChinese ? "测试当前 API Profile" : "Test Selected API Profile" }
-    var promptProfilesTitle: String { language == .simplifiedChinese ? "Prompt Profiles" : "Prompt Profiles" }
-    var promptProfilesSubtitle: String { language == .simplifiedChinese ? "为不同字幕翻译场景保留独立的 system prompt。" : "Keep separate system prompts for different subtitle translation scenarios." }
-    var activePrompt: String { language == .simplifiedChinese ? "当前 Prompt" : "Active Prompt" }
-    var activePromptDetail: String { language == .simplifiedChinese ? "所选 profile 会用于 OpenAI-compatible 翻译。" : "The selected profile will be used for OpenAI-compatible translation." }
-    var addPromptProfile: String { language == .simplifiedChinese ? "新增 Prompt Profile" : "Add Prompt Profile" }
-    var resetToPreset: String { language == .simplifiedChinese ? "恢复预设" : "Reset to Preset" }
-    var promptProfileName: String { language == .simplifiedChinese ? "Prompt Profile 名称" : "Prompt Profile Name" }
-    var promptPlaceholderHelp: String { language == .simplifiedChinese ? "可使用 `{{target_language}}` 作为目标语言占位符。保留多个 prompt profile，便于在会议、直播和通用翻译场景间切换。" : "Use `{{target_language}}` as a placeholder for the selected target language. Keeping multiple prompt profiles makes it easier to switch between meeting, streaming, and general translation styles." }
-    var liveStateTitle: String { language == .simplifiedChinese ? "实时状态" : "Live State" }
-    var liveStateSubtitle: String { language == .simplifiedChinese ? "查看应用当前读取和翻译到的内容。" : "See what the app is currently reading and translating." }
-    var focusedApp: String { language == .simplifiedChinese ? "当前应用" : "Focused App" }
-    var focusedRole: String { language == .simplifiedChinese ? "当前角色" : "Focused Role" }
-    var activePromptCard: String { language == .simplifiedChinese ? "当前 Prompt" : "Active Prompt" }
-    var status: String { language == .simplifiedChinese ? "状态" : "Status" }
-    var capturedText: String { language == .simplifiedChinese ? "捕获文本" : "Captured Text" }
-    var translatedText: String { language == .simplifiedChinese ? "翻译结果" : "Translated Text" }
-    var noCapturedText: String { language == .simplifiedChinese ? "还没有捕获到实时文本。" : "No live text captured yet." }
-    var noTranslationYet: String { language == .simplifiedChinese ? "还没有翻译结果。" : "No translation yet." }
-    var prototypeNotesTitle: String { language == .simplifiedChinese ? "原型说明" : "Prototype Notes" }
-    var prototypeNotesSubtitle: String { language == .simplifiedChinese ? "当前 Accessibility 方案已知的限制。" : "Known limitations of the current Accessibility-based approach." }
-    var noteIME: String { language == .simplifiedChinese ? "Accessibility 无法稳定提供中文 IME 的组合态文本。通常只能拿到已上屏文本，而不是候选中的中间态字符串。" : "Chinese IME composition text is not guaranteed through Accessibility. You usually get committed text, not the in-progress candidate string." }
-    var noteSecure: String { language == .simplifiedChinese ? "密码框和安全输入框会被有意忽略。" : "Password and secure fields are intentionally ignored." }
-    var noteNearCaret: String { language == .simplifiedChinese ? "大型编辑器只会截取光标附近的文本，避免每次按键都整篇重译导致浮窗抖动。" : "Large editors are truncated to the text near the caret so the overlay stays stable instead of retranslating an entire document on every keystroke." }
-    var noteIMEPath: String { language == .simplifiedChinese ? "长期方案是基于 InputMethodKit 的真正输入法扩展。" : "The long-term upgrade path is a true IME extension built with InputMethodKit." }
-    var waitingForInput: String { language == .simplifiedChinese ? "等待输入" : "Waiting for input" }
-    var accessibilityPermissionRequired: String { language == .simplifiedChinese ? "需要辅助功能权限" : "Accessibility permission required" }
-    var accessibilityEnabledStatus: String { language == .simplifiedChinese ? "辅助功能已开启" : "Accessibility enabled" }
-    var grantAccessibilityInSettings: String { language == .simplifiedChinese ? "请在系统设置中开启辅助功能权限" : "Grant Accessibility permission in System Settings" }
-    var grantPermissionOverlay: String { language == .simplifiedChinese ? "授予权限" : "Grant Permission" }
-}
-
 enum ShortcutKey: String, CaseIterable, Identifiable, Codable {
     case a, b, c, d, e, f, g, h, i, j, k, l, m
     case n, o, p, q, r, s, t, u, v, w, x, y, z
@@ -511,13 +298,13 @@ struct WakeShortcut: Codable, Equatable {
 
 @MainActor
 final class AppState: ObservableObject {
-    private enum DefaultsDomain {
+    enum DefaultsDomain {
         static let primary = "io.github.derooce.typelingo"
         static let legacyBundle = "com.codex.live-translate"
         static let legacyCLI = "live-translate"
     }
 
-    private enum DefaultsKey {
+    enum DefaultsKey {
         static let interfaceLanguage = "LiveTranslate.InterfaceLanguage"
         static let selectedProvider = "LiveTranslate.SelectedProvider"
         static let selectedProviderProfileID = "LiveTranslate.SelectedProviderProfileID"
@@ -530,7 +317,6 @@ final class AppState: ObservableObject {
         static let wakeShortcut = "LiveTranslate.WakeShortcut"
         static let didPromptAccessibilityOnboarding = "LiveTranslate.DidPromptAccessibilityOnboarding"
 
-        // Legacy single-config keys for migration.
         static let legacyOpenAIAPIKey = "LiveTranslate.OpenAIAPIKey"
         static let legacyOpenAIBaseURL = "LiveTranslate.OpenAIBaseURL"
         static let legacyOpenAIModel = "LiveTranslate.OpenAIModel"
@@ -603,17 +389,29 @@ final class AppState: ObservableObject {
     @Published var providerTestStatus: String
     @Published var isTestingProvider: Bool
     @Published var settingsTransferStatus: String
+    @Published var providerConfigurationWarning: String?
+    @Published var wakeShortcutWarning: String?
     @Published var errorMessage: String?
 
-    private let defaults: UserDefaults
+    let defaults: UserDefaults
+    let keychainClient: KeychainClient
     private var translationTask: Task<Void, Never>?
+    private var providerTestTask: Task<Void, Never>?
+    private var lastCapturedSnapshot: CapturedTextSnapshot?
     private var revision = 0
+    private var providerTestRevision = 0
 
-    init(defaults: UserDefaults = AppState.makeDefaults()) {
+    init(
+        defaults: UserDefaults = AppState.makeDefaults(),
+        keychainClient: KeychainClient = .live
+    ) {
         self.defaults = defaults
+        self.keychainClient = keychainClient
         Self.migrateLegacyDefaultsIfNeeded(into: defaults)
 
-        let loadedProviderProfiles = Self.loadProviderProfiles(from: defaults)
+        let initialCopy = LocalizedCopy(language: InterfaceLanguage(rawValue: defaults.string(forKey: DefaultsKey.interfaceLanguage) ?? InterfaceLanguage.english.rawValue) ?? .english)
+        let loadedProviders = Self.loadProviderProfiles(from: defaults, keychainClient: keychainClient, copy: initialCopy)
+        let loadedProviderProfiles = loadedProviders.profiles
         let loadedPromptProfiles = Self.loadPromptProfiles(from: defaults)
         let savedInterfaceLanguage = defaults.string(forKey: DefaultsKey.interfaceLanguage) ?? InterfaceLanguage.english.rawValue
 
@@ -650,17 +448,23 @@ final class AppState: ObservableObject {
         self.subtitleFontSize = savedSubtitleSize == 0 ? 30 : savedSubtitleSize
         self.wakeShortcut = Self.loadWakeShortcut(from: defaults)
 
-        self.providerTestStatus = (InterfaceLanguage(rawValue: savedInterfaceLanguage) ?? .english) == .simplifiedChinese ? "尚未测试" : "Not tested"
+        self.providerTestStatus = initialCopy.notTested
         self.isTestingProvider = false
-        self.settingsTransferStatus = (InterfaceLanguage(rawValue: savedInterfaceLanguage) ?? .english) == .simplifiedChinese ? "还没有导入或导出记录" : "No import or export yet"
+        self.settingsTransferStatus = initialCopy.noSettingsTransferYet
+        self.providerConfigurationWarning = loadedProviders.warningMessage
+        self.wakeShortcutWarning = nil
         self.errorMessage = nil
+        self.lastCapturedSnapshot = nil
         self.providerStatus = isAccessibilityTrusted ? copy.waitingForInput : copy.accessibilityPermissionRequired
 
         saveProviderProfiles()
         savePromptProfiles()
         defaults.set(selectedProviderProfileID, forKey: DefaultsKey.selectedProviderProfileID)
         defaults.set(selectedPromptProfileID, forKey: DefaultsKey.selectedPromptProfileID)
-        Self.cleanupLegacyDefaults(in: defaults)
+        Self.cleanupLegacyDefaults(in: defaults, keychainClient: keychainClient)
+        if let warningMessage = loadedProviders.warningMessage {
+            providerConfigurationWarning = warningMessage
+        }
     }
 
     var currentProviderProfile: AIProviderProfile? {
@@ -680,7 +484,7 @@ final class AppState: ObservableObject {
         case .googleWeb:
             return TranslationProviderKind.googleWeb.displayName
         case .openAICompatible:
-            return currentProviderProfile?.name ?? "LLM API"
+            return currentProviderProfile?.name ?? copy.defaultLLMProviderName
         }
     }
 
@@ -723,11 +527,16 @@ final class AppState: ObservableObject {
     }
 
     func updateCapturedText(_ snapshot: CapturedTextSnapshot) {
+        let didContextChange = lastCapturedSnapshot?.appName != snapshot.appName
+            || lastCapturedSnapshot?.bundleIdentifier != snapshot.bundleIdentifier
+            || lastCapturedSnapshot?.role != snapshot.role
+
         lastObservedApp = snapshot.appName
         lastObservedRole = snapshot.role
         errorMessage = nil
+        lastCapturedSnapshot = snapshot
 
-        guard snapshot.text != sourceText else {
+        guard snapshot.text != sourceText || didContextChange else {
             return
         }
 
@@ -736,6 +545,7 @@ final class AppState: ObservableObject {
     }
 
     func clearCapturedText() {
+        lastCapturedSnapshot = nil
         guard !sourceText.isEmpty || !translatedText.isEmpty || errorMessage != nil else {
             providerStatus = isAccessibilityTrusted ? copy.waitingForInput : copy.accessibilityPermissionRequired
             return
@@ -762,80 +572,31 @@ final class AppState: ObservableObject {
         wakeShortcut = shortcut
     }
 
+    func applyWakeShortcutRegistrationResult(_ result: HotKeyRegistrationResult) {
+        switch result {
+        case .success:
+            wakeShortcutWarning = nil
+        case let .rolledBack(activeShortcut, message):
+            wakeShortcutWarning = message
+            if activeShortcut != wakeShortcut {
+                wakeShortcut = activeShortcut
+            }
+        case let .failure(activeShortcut, message):
+            wakeShortcutWarning = message
+            if let activeShortcut, activeShortcut != wakeShortcut {
+                wakeShortcut = activeShortcut
+            }
+        }
+    }
+
+    func updateWakeShortcutRecorderHint(_ text: String) {
+        wakeShortcutWarning = text.isEmpty ? nil : text
+    }
+
     func setWakeShortcutModifier(_ modifier: ShortcutModifier, enabled: Bool) {
         wakeShortcut = wakeShortcut.updating(modifier: modifier, enabled: enabled)
     }
 
-    func exportSettings(includeSecrets: Bool = false) {
-        let panel = NSSavePanel()
-        panel.title = interfaceLanguage == .simplifiedChinese ? "导出 TypeLingo 设置" : "Export TypeLingo Settings"
-        panel.message = includeSecrets
-            ? (interfaceLanguage == .simplifiedChinese ? "将当前所有设置（包含 API key）保存为 JSON 文件。" : "Save all current settings, including API keys, to a JSON file.")
-            : (interfaceLanguage == .simplifiedChinese ? "将当前设置保存为不包含 API key 的 JSON 文件。" : "Save current settings to a JSON file without API keys.")
-        panel.nameFieldStringValue = includeSecrets
-            ? "typelingo-settings-with-secrets.json"
-            : "typelingo-settings.json"
-        panel.allowedContentTypes = [.json]
-        panel.canCreateDirectories = true
-
-        guard panel.runModal() == .OK, let url = panel.url else {
-            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "已取消导出" : "Export cancelled"
-            return
-        }
-
-        let payload = SettingsTransferBundle(
-            schemaVersion: 1,
-            exportedAt: Date(),
-            selectedProvider: selectedProvider.rawValue,
-            selectedProviderProfileID: selectedProviderProfileID,
-            selectedPromptProfileID: selectedPromptProfileID,
-            targetLanguage: targetLanguage.rawValue,
-            overlayOpacity: overlayOpacity,
-            subtitleFontSize: subtitleFontSize,
-            wakeShortcut: wakeShortcut,
-            providerProfiles: providerProfiles.map { $0.sanitizedForExport(includeSecrets: includeSecrets) },
-            promptProfiles: promptProfiles
-        )
-
-        do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            encoder.dateEncodingStrategy = .iso8601
-            let data = try encoder.encode(payload)
-            try data.write(to: url, options: .atomic)
-            settingsTransferStatus = includeSecrets
-                ? (interfaceLanguage == .simplifiedChinese ? "已导出包含 API key 的设置到 \(url.lastPathComponent)" : "Exported settings with API keys to \(url.lastPathComponent)")
-                : (interfaceLanguage == .simplifiedChinese ? "已导出设置到 \(url.lastPathComponent)" : "Exported settings to \(url.lastPathComponent)")
-        } catch {
-            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "导出失败：\(error.localizedDescription)" : "Export failed: \(error.localizedDescription)"
-        }
-    }
-
-    func importSettings() {
-        let panel = NSOpenPanel()
-        panel.title = interfaceLanguage == .simplifiedChinese ? "导入 TypeLingo 设置" : "Import TypeLingo Settings"
-        panel.message = interfaceLanguage == .simplifiedChinese ? "从 JSON 文件导入 provider、prompt、浮窗和快捷键设置。" : "Import provider, prompt, overlay, and shortcut settings from a JSON file."
-        panel.allowedContentTypes = [.json]
-        panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = false
-        panel.canChooseFiles = true
-
-        guard panel.runModal() == .OK, let url = panel.url else {
-            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "已取消导入" : "Import cancelled"
-            return
-        }
-
-        do {
-            let data = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            let payload = try decoder.decode(SettingsTransferBundle.self, from: data)
-            applyImportedSettings(payload)
-            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "已从 \(url.lastPathComponent) 导入设置" : "Imported settings from \(url.lastPathComponent)"
-        } catch {
-            settingsTransferStatus = interfaceLanguage == .simplifiedChinese ? "导入失败：\(error.localizedDescription)" : "Import failed: \(error.localizedDescription)"
-        }
-    }
 
     func chooseProviderProfile(id: String) {
         guard providerProfiles.contains(where: { $0.id == id }) else {
@@ -864,7 +625,7 @@ final class AppState: ObservableObject {
         let index = providerProfiles.count + 1
         let profile = AIProviderProfile(
             id: UUID().uuidString,
-            name: "LLM API \(index)",
+            name: copy.numberedLLMApiProfile(index),
             apiKey: "",
             baseURL: "https://api.openai.com/v1",
             model: "gpt-4.1-mini"
@@ -882,7 +643,7 @@ final class AppState: ObservableObject {
 
         var duplicate = profile
         duplicate.id = UUID().uuidString
-        duplicate.name = "\(profile.name) Copy"
+        duplicate.name = copy.copiedProfileName(profile.name)
         providerProfiles.append(duplicate)
         selectedProviderProfileID = duplicate.id
         selectedProvider = .openAICompatible
@@ -894,13 +655,26 @@ final class AppState: ObservableObject {
             return
         }
 
-        let removedProfileID = providerProfiles[index].id
+        let removedProfile = providerProfiles[index]
         providerProfiles.remove(at: index)
-        KeychainStore.deleteAPIKey(profileID: removedProfileID)
+        do {
+            try keychainClient.deleteAPIKey(removedProfile.id)
+        } catch {
+            appendProviderConfigurationWarning(providerConfigurationDeleteWarningMessage(for: removedProfile.name, error: error))
+        }
         selectedProviderProfileID = providerProfiles[min(index, providerProfiles.count - 1)].id
         if selectedProvider == .openAICompatible {
             scheduleTranslation()
         }
+    }
+
+
+    func clearWakeShortcutWarning() {
+        wakeShortcutWarning = nil
+    }
+
+    func setWakeShortcutWarning(_ message: String) {
+        wakeShortcutWarning = message
     }
 
     func updateSelectedPromptProfile(_ mutate: (inout PromptProfile) -> Void) {
@@ -920,7 +694,7 @@ final class AppState: ObservableObject {
     func addPromptProfile() {
         let profile = PromptProfile(
             id: UUID().uuidString,
-            name: "Prompt \(promptProfiles.count + 1)",
+            name: copy.numberedPromptProfile(promptProfiles.count + 1),
             prompt: defaultOpenAISystemPrompt
         )
         promptProfiles.append(profile)
@@ -938,7 +712,7 @@ final class AppState: ObservableObject {
 
         var duplicate = profile
         duplicate.id = UUID().uuidString
-        duplicate.name = "\(profile.name) Copy"
+        duplicate.name = copy.copiedProfileName(profile.name)
         promptProfiles.append(duplicate)
         selectedPromptProfileID = duplicate.id
         if selectedProvider == .openAICompatible {
@@ -981,10 +755,9 @@ final class AppState: ObservableObject {
         providerProfileID: String,
         promptProfileID: String
     ) {
-        guard !isTestingProvider else {
-            return
-        }
-
+        providerTestTask?.cancel()
+        providerTestRevision += 1
+        let currentProviderTestRevision = providerTestRevision
         isTestingProvider = true
         providerTestStatus = copy.testing
 
@@ -992,22 +765,46 @@ final class AppState: ObservableObject {
             openAIProfile: providerProfiles.first(where: { $0.id == providerProfileID }),
             promptProfile: promptProfiles.first(where: { $0.id == promptProfileID })
         )
+        let testedProviderName = provider == .googleWeb
+            ? copy.googleWebProviderName
+            : (providerProfiles.first(where: { $0.id == providerProfileID })?.name ?? copy.defaultLLMProviderName)
 
-        Task {
+        providerTestTask = Task {
             do {
-                let service = TranslationService(provider: provider, configuration: config)
+                let service = TranslationService(
+                    provider: provider,
+                    configuration: config,
+                    requestTimeout: 5
+                )
                 let result = try await service.translate(text: "你好，世界", targetLanguage: .english)
 
                 await MainActor.run {
+                    guard currentProviderTestRevision == self.providerTestRevision else {
+                        return
+                    }
                     self.isTestingProvider = false
+                    self.providerTestTask = nil
                     self.providerTestStatus = result.translatedText.isEmpty
-                        ? "\(provider == .googleWeb ? "Google Web" : self.currentProviderDisplayName) failed: empty response"
-                        : "\(provider == .googleWeb ? "Google Web" : self.currentProviderDisplayName) OK · \(result.latencyMs)ms · \(result.translatedText)"
+                        ? self.copy.providerTestingEmptyResponse(providerName: testedProviderName)
+                        : self.copy.providerTestingSuccess(providerName: testedProviderName, latencyMs: result.latencyMs, result: result.translatedText)
+                }
+            } catch is CancellationError {
+                await MainActor.run {
+                    guard currentProviderTestRevision == self.providerTestRevision else {
+                        return
+                    }
+                    self.isTestingProvider = false
+                    self.providerTestTask = nil
+                    self.providerTestStatus = self.copy.notTested
                 }
             } catch {
                 await MainActor.run {
+                    guard currentProviderTestRevision == self.providerTestRevision else {
+                        return
+                    }
                     self.isTestingProvider = false
-                    self.providerTestStatus = "\(provider == .googleWeb ? "Google Web" : self.currentProviderDisplayName) failed · \(error.localizedDescription)"
+                    self.providerTestTask = nil
+                    self.providerTestStatus = self.copy.providerTestingFailure(providerName: testedProviderName, detail: error.localizedDescription)
                 }
             }
         }
@@ -1026,7 +823,7 @@ final class AppState: ObservableObject {
             return
         }
 
-        providerStatus = "Translating via \(currentProviderDisplayName)..."
+        providerStatus = copy.translatingVia(providerName: currentProviderDisplayName)
         let config = TranslationConfiguration(
             openAIProfile: currentProviderProfile,
             promptProfile: currentPromptProfile
@@ -1053,7 +850,7 @@ final class AppState: ObservableObject {
                     }
 
                     self.translatedText = result.translatedText
-                    self.providerStatus = "\(self.currentProviderDisplayName) \(result.latencyMs)ms"
+                    self.providerStatus = self.copy.translationStatus(providerName: self.currentProviderDisplayName, latencyMs: result.latencyMs)
                     self.errorMessage = nil
                 }
             } catch is CancellationError {
@@ -1064,7 +861,7 @@ final class AppState: ObservableObject {
                         return
                     }
 
-                    self.providerStatus = "Translation failed"
+                    self.providerStatus = self.copy.translationFailed
                     self.errorMessage = error.localizedDescription
                     self.translatedText = ""
                 }
@@ -1072,230 +869,6 @@ final class AppState: ObservableObject {
         }
     }
 
-    private func saveProviderProfiles() {
-        for profile in providerProfiles {
-            let apiKey = profile.apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
-            if apiKey.isEmpty {
-                KeychainStore.deleteAPIKey(profileID: profile.id)
-            } else {
-                KeychainStore.saveAPIKey(apiKey, profileID: profile.id)
-            }
-        }
-
-        let sanitizedProfiles = providerProfiles.map { $0.sanitizedForStorage() }
-        if let data = try? JSONEncoder().encode(sanitizedProfiles) {
-            defaults.set(data, forKey: DefaultsKey.providerProfiles)
-        }
-        Self.cleanupLegacyDefaults(in: defaults)
-    }
-
-    private func saveWakeShortcut() {
-        if let data = try? JSONEncoder().encode(wakeShortcut) {
-            defaults.set(data, forKey: DefaultsKey.wakeShortcut)
-        }
-    }
-
-    private func savePromptProfiles() {
-        if let data = try? JSONEncoder().encode(promptProfiles) {
-            defaults.set(data, forKey: DefaultsKey.promptProfiles)
-        }
-    }
-
-    private static func loadProviderProfiles(from defaults: UserDefaults) -> [AIProviderProfile] {
-        if let data = defaults.data(forKey: DefaultsKey.providerProfiles),
-           let profiles = try? JSONDecoder().decode([AIProviderProfile].self, from: data),
-           !profiles.isEmpty {
-            return profiles.map { profile in
-                var hydrated = profile.sanitizedForStorage()
-                let existingKey = profile.apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !existingKey.isEmpty {
-                    KeychainStore.saveAPIKey(existingKey, profileID: profile.id)
-                }
-                hydrated.apiKey = KeychainStore.loadAPIKey(profileID: profile.id)
-                return hydrated
-            }
-        }
-
-        let legacyKey = defaults.string(forKey: DefaultsKey.legacyOpenAIAPIKey) ?? ""
-        let legacyBase = defaults.string(forKey: DefaultsKey.legacyOpenAIBaseURL) ?? "https://api.openai.com/v1"
-        let legacyModel = defaults.string(forKey: DefaultsKey.legacyOpenAIModel) ?? "gpt-4.1-mini"
-        let profile = AIProviderProfile(
-            id: UUID().uuidString,
-            name: "Default LLM API",
-            apiKey: legacyKey,
-            baseURL: legacyBase,
-            model: legacyModel
-        )
-        if !legacyKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            KeychainStore.saveAPIKey(legacyKey, profileID: profile.id)
-        }
-        return [
-            AIProviderProfile(
-                id: profile.id,
-                name: profile.name,
-                apiKey: KeychainStore.loadAPIKey(profileID: profile.id),
-                baseURL: profile.baseURL,
-                model: profile.model
-            )
-        ]
-    }
-
-    private static func loadWakeShortcut(from defaults: UserDefaults) -> WakeShortcut {
-        if let data = defaults.data(forKey: DefaultsKey.wakeShortcut),
-           let shortcut = try? JSONDecoder().decode(WakeShortcut.self, from: data) {
-            return shortcut
-        }
-        return .defaultValue
-    }
-
-    private static func defaultPromptProfiles() -> [PromptProfile] {
-        [
-            PromptProfile(id: UUID().uuidString, name: "General", prompt: defaultOpenAISystemPrompt),
-            PromptProfile(id: UUID().uuidString, name: "Meeting", prompt: meetingOpenAISystemPrompt),
-            PromptProfile(id: UUID().uuidString, name: "Streaming", prompt: streamingOpenAISystemPrompt)
-        ]
-    }
-
-    private static func loadPromptProfiles(from defaults: UserDefaults) -> [PromptProfile] {
-        if let data = defaults.data(forKey: DefaultsKey.promptProfiles),
-           let profiles = try? JSONDecoder().decode([PromptProfile].self, from: data),
-           !profiles.isEmpty {
-            return profiles
-        }
-
-        let legacyPrompt = defaults.string(forKey: DefaultsKey.legacyOpenAISystemPrompt)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        var profiles = defaultPromptProfiles()
-
-        if !legacyPrompt.isEmpty, legacyPrompt != defaultOpenAISystemPrompt {
-            profiles.append(
-                PromptProfile(
-                    id: UUID().uuidString,
-                    name: "Migrated Custom",
-                    prompt: legacyPrompt
-                )
-            )
-        }
-
-        return profiles
-    }
-
-    private static func resolveProviderProfileID(_ savedID: String?, profiles: [AIProviderProfile]) -> String {
-        if let savedID, profiles.contains(where: { $0.id == savedID }) {
-            return savedID
-        }
-        return profiles.first?.id ?? UUID().uuidString
-    }
-
-    private static func resolvePromptProfileID(_ savedID: String?, profiles: [PromptProfile]) -> String {
-        if let savedID, profiles.contains(where: { $0.id == savedID }) {
-            return savedID
-        }
-        return profiles.first?.id ?? UUID().uuidString
-    }
-
-    private func applyImportedSettings(_ payload: SettingsTransferBundle) {
-        let importedProviders = payload.providerProfiles.isEmpty ? Self.loadProviderProfiles(from: defaults) : payload.providerProfiles
-        let importedPrompts = payload.promptProfiles.isEmpty ? Self.defaultPromptProfiles() : payload.promptProfiles
-        let removedProfileIDs = Set(providerProfiles.map(\.id)).subtracting(importedProviders.map(\.id))
-        for removedProfileID in removedProfileIDs {
-            KeychainStore.deleteAPIKey(profileID: removedProfileID)
-        }
-
-        providerProfiles = importedProviders
-        promptProfiles = importedPrompts
-        selectedProviderProfileID = Self.resolveProviderProfileID(payload.selectedProviderProfileID, profiles: importedProviders)
-        selectedPromptProfileID = Self.resolvePromptProfileID(payload.selectedPromptProfileID, profiles: importedPrompts)
-        selectedProvider = TranslationProviderKind(rawValue: payload.selectedProvider) ?? .googleWeb
-        targetLanguage = TargetLanguage(rawValue: payload.targetLanguage) ?? .english
-        overlayOpacity = min(max(payload.overlayOpacity, 0.22), 0.96)
-        subtitleFontSize = min(max(payload.subtitleFontSize, 22), 52)
-        wakeShortcut = payload.wakeShortcut.hasAnyModifier ? payload.wakeShortcut : .defaultValue
-        errorMessage = nil
-    }
-
-    private static func makeDefaults() -> UserDefaults {
-        UserDefaults(suiteName: DefaultsDomain.primary) ?? .standard
-    }
-
-    private static func migrateLegacyDefaultsIfNeeded(into defaults: UserDefaults) {
-        let keysToMigrate = [
-            DefaultsKey.selectedProvider,
-            DefaultsKey.selectedProviderProfileID,
-            DefaultsKey.selectedPromptProfileID,
-            DefaultsKey.targetLanguage,
-            DefaultsKey.providerProfiles,
-            DefaultsKey.promptProfiles,
-            DefaultsKey.subtitleFontSize,
-            DefaultsKey.overlayOpacity,
-            DefaultsKey.wakeShortcut,
-            DefaultsKey.legacyOpenAIAPIKey,
-            DefaultsKey.legacyOpenAIBaseURL,
-            DefaultsKey.legacyOpenAIModel,
-            DefaultsKey.legacyOpenAISystemPrompt
-        ]
-
-        let legacyDomains = [DefaultsDomain.legacyBundle, DefaultsDomain.legacyCLI]
-        for key in keysToMigrate where defaults.object(forKey: key) == nil {
-            for domain in legacyDomains {
-                guard let legacyDefaults = UserDefaults(suiteName: domain),
-                      let value = legacyDefaults.object(forKey: key) else {
-                    continue
-                }
-                defaults.set(value, forKey: key)
-                break
-            }
-        }
-
-        defaults.synchronize()
-    }
-
-    private static func cleanupLegacyDefaults(in defaults: UserDefaults) {
-        sanitizeStoredProviderProfiles(in: defaults)
-        clearLegacySingleProviderKeys(in: defaults)
-        defaults.synchronize()
-
-        let legacyDomains = [DefaultsDomain.legacyBundle, DefaultsDomain.legacyCLI]
-        for domain in legacyDomains {
-            guard let legacyDefaults = UserDefaults(suiteName: domain),
-                  legacyDefaults != defaults else {
-                continue
-            }
-
-            sanitizeStoredProviderProfiles(in: legacyDefaults)
-            clearLegacySingleProviderKeys(in: legacyDefaults)
-            legacyDefaults.synchronize()
-        }
-    }
-
-    private static func sanitizeStoredProviderProfiles(in defaults: UserDefaults) {
-        guard let data = defaults.data(forKey: DefaultsKey.providerProfiles),
-              let profiles = try? JSONDecoder().decode([AIProviderProfile].self, from: data),
-              !profiles.isEmpty else {
-            return
-        }
-
-        let sanitizedProfiles = profiles.map { profile in
-            let apiKey = profile.apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !apiKey.isEmpty {
-                KeychainStore.saveAPIKey(apiKey, profileID: profile.id)
-            }
-            return profile.sanitizedForStorage()
-        }
-
-        guard let sanitizedData = try? JSONEncoder().encode(sanitizedProfiles),
-              sanitizedData != data else {
-            return
-        }
-
-        defaults.set(sanitizedData, forKey: DefaultsKey.providerProfiles)
-    }
-
-    private static func clearLegacySingleProviderKeys(in defaults: UserDefaults) {
-        defaults.removeObject(forKey: DefaultsKey.legacyOpenAIAPIKey)
-        defaults.removeObject(forKey: DefaultsKey.legacyOpenAIBaseURL)
-        defaults.removeObject(forKey: DefaultsKey.legacyOpenAIModel)
-        defaults.removeObject(forKey: DefaultsKey.legacyOpenAISystemPrompt)
-    }
 }
 
 extension Notification.Name {
@@ -1372,30 +945,28 @@ struct ControlPanelView: View {
     }
 
     private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("TypeLingo")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-
-            Text(copy.appTagline)
-                .font(.system(size: 13))
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 10) {
-                SummaryPill(
-                    title: appState.isAccessibilityTrusted ? copy.accessibilityReady : copy.accessibilityNeeded,
-                    symbolName: appState.isAccessibilityTrusted ? "checkmark.shield" : "exclamationmark.triangle",
-                    tint: appState.isAccessibilityTrusted ? .green : .orange
-                )
-                SummaryPill(
-                    title: appState.currentProviderDisplayName,
-                    symbolName: "network",
-                    tint: .blue
-                )
-                SummaryPill(
-                    title: appState.wakeShortcut.symbolDisplayName,
-                    symbolName: "keyboard",
-                    tint: .pink
-                )
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("TypeLingo")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                    Text(copy.appTagline)
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 8) {
+                    SummaryPill(
+                        title: appState.isAccessibilityTrusted ? copy.accessibilityReady : copy.accessibilityNeeded,
+                        symbolName: appState.isAccessibilityTrusted ? "checkmark.seal.fill" : "exclamationmark.triangle.fill",
+                        tint: appState.isAccessibilityTrusted ? .green : .orange
+                    )
+                    SummaryPill(
+                        title: appState.currentProviderDisplayName,
+                        symbolName: appState.selectedProvider == .googleWeb ? "globe" : "network",
+                        tint: .blue
+                    )
+                }
             }
         }
         .padding(22)
@@ -1519,6 +1090,12 @@ struct ControlPanelView: View {
                     Text("\(copy.currentShortcutPrefix) \(appState.wakeShortcutDisplayName)")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
+
+                    if let wakeShortcutWarning = appState.wakeShortcutWarning {
+                        Text(wakeShortcutWarning)
+                            .font(.system(size: 12))
+                            .foregroundStyle(.orange)
+                    }
                 }
 
                 Divider()
@@ -1630,6 +1207,13 @@ struct ControlPanelView: View {
                         .foregroundStyle(.secondary)
                         .textSelection(.enabled)
                 }
+
+                if let providerConfigurationWarning = appState.providerConfigurationWarning {
+                    Text(providerConfigurationWarning)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.orange)
+                        .textSelection(.enabled)
+                }
             }
 
             settingsCard(
@@ -1659,86 +1243,109 @@ struct ControlPanelView: View {
                     Button(copy.remove) {
                         appState.removeSelectedProviderProfile()
                     }
-                    .disabled(appState.providerProfiles.count <= 1)
+                    .disabled(appState.providerProfiles.count == 1)
                 }
-                .buttonStyle(.bordered)
 
-                Divider()
+                if let currentProviderProfile = appState.currentProviderProfile {
+                    Divider()
 
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(copy.selectedAPIProfile)
-                        .font(.system(size: 16, weight: .semibold))
-
-                    TextField(copy.profileName, text: providerProfileBinding(\.name))
-                        .textFieldStyle(.roundedBorder)
-
-                    SecureField(copy.apiKey, text: providerProfileBinding(\.apiKey))
-                        .textFieldStyle(.roundedBorder)
-
-                    TextField(copy.baseURL, text: providerProfileBinding(\.baseURL))
-                        .textFieldStyle(.roundedBorder)
-
-                    TextField(copy.model, text: providerProfileBinding(\.model))
-                        .textFieldStyle(.roundedBorder)
-
-                    Button(copy.testSelectedAPIProfile) {
-                        appState.testSelectedLLMProfile()
+                    Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
+                        GridRow {
+                            settingLabel(copy.profileName, detail: "")
+                            TextField(copy.profileName, text: providerProfileBinding(\.name))
+                                .textFieldStyle(.roundedBorder)
+                        }
+                        GridRow {
+                            settingLabel(copy.apiKey, detail: "")
+                            SecureField(copy.apiKey, text: providerProfileBinding(\.apiKey))
+                                .textFieldStyle(.roundedBorder)
+                        }
+                        GridRow {
+                            settingLabel(copy.baseURL, detail: "")
+                            TextField(copy.baseURL, text: providerProfileBinding(\.baseURL))
+                                .textFieldStyle(.roundedBorder)
+                        }
+                        GridRow {
+                            settingLabel(copy.model, detail: "")
+                            TextField(copy.model, text: providerProfileBinding(\.model))
+                                .textFieldStyle(.roundedBorder)
+                        }
                     }
-                    .disabled(appState.isTestingProvider)
-                    .buttonStyle(.bordered)
+
+                    HStack(spacing: 12) {
+                        Button(appState.isTestingProvider ? copy.testing : copy.testSelectedAPIProfile) {
+                            appState.testSelectedLLMProfile()
+                        }
+                        .disabled(appState.isTestingProvider)
+                        .buttonStyle(.bordered)
+
+                        Text(currentProviderProfile.id)
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                    }
                 }
             }
         }
     }
 
     private var promptsContent: some View {
-        settingsCard(
-            title: copy.promptProfilesTitle,
-            subtitle: copy.promptProfilesSubtitle
-        ) {
-            Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
-                GridRow {
-                    settingLabel(copy.activePrompt, detail: copy.activePromptDetail)
-                    Picker(copy.activePrompt, selection: $appState.selectedPromptProfileID) {
-                        ForEach(appState.promptProfiles) { profile in
-                            Text(profile.name).tag(profile.id)
+        VStack(alignment: .leading, spacing: 18) {
+            settingsCard(
+                title: copy.promptProfilesTitle,
+                subtitle: copy.promptProfilesSubtitle
+            ) {
+                Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
+                    GridRow {
+                        settingLabel(copy.activePrompt, detail: copy.activePromptDetail)
+                        Picker(copy.activePrompt, selection: $appState.selectedPromptProfileID) {
+                            ForEach(appState.promptProfiles) { profile in
+                                Text(profile.name).tag(profile.id)
+                            }
                         }
+                        .pickerStyle(.menu)
+                        .frame(maxWidth: 240, alignment: .leading)
                     }
-                    .pickerStyle(.menu)
-                    .frame(maxWidth: 240, alignment: .leading)
                 }
+
+                HStack(spacing: 10) {
+                    Button(copy.addPromptProfile) {
+                        appState.addPromptProfile()
+                    }
+                    Button(copy.duplicate) {
+                        appState.duplicateSelectedPromptProfile()
+                    }
+                    Button(copy.remove) {
+                        appState.removeSelectedPromptProfile()
+                    }
+                    .disabled(appState.promptProfiles.count == 1)
+                    Button(copy.resetToPreset) {
+                        appState.resetSelectedPromptProfileToPreset()
+                    }
+                }
+
+                Divider()
+
+                Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
+                    GridRow {
+                        settingLabel(copy.promptProfileName, detail: "")
+                        TextField(copy.promptProfileName, text: promptProfileBinding(\.name))
+                            .textFieldStyle(.roundedBorder)
+                    }
+                    GridRow(alignment: .top) {
+                        settingLabel(copy.activePrompt, detail: copy.promptPlaceholderHelp)
+                        TextEditor(text: promptProfileBinding(\.prompt))
+                            .font(.system(size: 13, design: .monospaced))
+                            .frame(minHeight: 220)
+                            .padding(8)
+                            .background(Color.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                }
+
+                Text(copy.promptPlaceholderHelp)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
             }
-
-            HStack(spacing: 10) {
-                Button(copy.addPromptProfile) {
-                    appState.addPromptProfile()
-                }
-                Button(copy.duplicate) {
-                    appState.duplicateSelectedPromptProfile()
-                }
-                Button(copy.remove) {
-                    appState.removeSelectedPromptProfile()
-                }
-                .disabled(appState.promptProfiles.count <= 1)
-                Spacer()
-                Button(copy.resetToPreset) {
-                    appState.resetSelectedPromptProfileToPreset()
-                }
-            }
-            .buttonStyle(.bordered)
-
-            TextField(copy.promptProfileName, text: promptProfileBinding(\.name))
-                .textFieldStyle(.roundedBorder)
-
-            TextEditor(text: promptProfileBinding(\.prompt))
-                .font(.system(size: 12, design: .monospaced))
-                .frame(minHeight: 280)
-                .padding(10)
-                .background(Color.black.opacity(0.05), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-            Text(copy.promptPlaceholderHelp)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
         }
     }
 
@@ -1755,7 +1362,7 @@ struct ControlPanelView: View {
                     diagnosticValueCard(copy.focusedApp, value: appState.lastObservedApp)
                     diagnosticValueCard(copy.focusedRole, value: appState.lastObservedRole)
                     diagnosticValueCard(copy.activeProvider, value: appState.currentProviderDisplayName)
-                    diagnosticValueCard(copy.activePromptCard, value: appState.currentPromptProfile?.name ?? "-")
+                    diagnosticValueCard(copy.activePromptCard, value: appState.currentPromptProfile?.name ?? copy.currentPromptDiagnosticsFallback)
                     diagnosticValueCard(copy.status, value: appState.providerStatus)
                     diagnosticValueCard(copy.wakeShortcut, value: appState.wakeShortcut.symbolDisplayName)
                 }
@@ -1767,6 +1374,18 @@ struct ControlPanelView: View {
                     Text(errorMessage)
                         .font(.system(size: 12))
                         .foregroundStyle(.red)
+                }
+
+                if let providerConfigurationWarning = appState.providerConfigurationWarning {
+                    Text(providerConfigurationWarning)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.orange)
+                }
+
+                if let wakeShortcutWarning = appState.wakeShortcutWarning {
+                    Text(wakeShortcutWarning)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.orange)
                 }
             }
 
@@ -1809,26 +1428,13 @@ struct ControlPanelView: View {
         }
     }
 
-    private func diagnosticValueCard(_ title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.system(size: 14, weight: .semibold))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .textSelection(.enabled)
-        }
-        .padding(14)
-        .background(Color.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-
     private func textPanel(title: String, text: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 14, weight: .semibold))
             ScrollView {
                 Text(text)
+                    .font(.system(size: 12))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
             }
@@ -1836,6 +1442,21 @@ struct ControlPanelView: View {
             .padding(12)
             .background(Color.black.opacity(0.05), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
+    }
+
+    private func diagnosticValueCard(_ title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.black.opacity(0.05), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private func diagnosticNote(_ text: String) -> some View {
@@ -1933,19 +1554,19 @@ struct ShortcutRecorderCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 if isRecording {
-                    Button(copy.testing) {
+                    Button(copy.recording) {
                         toggleRecording()
                     }
                     .buttonStyle(.borderedProminent)
                 } else {
-                    Button(appState.interfaceLanguage == .simplifiedChinese ? "录制快捷键" : "Record Shortcut") {
+                    Button(copy.recordShortcut) {
                         toggleRecording()
                     }
                     .buttonStyle(.bordered)
                 }
 
                 if isRecording {
-                    Button(appState.interfaceLanguage == .simplifiedChinese ? "取消" : "Cancel") {
+                    Button(copy.cancel) {
                         stopRecording()
                     }
                     .buttonStyle(.bordered)
@@ -2025,39 +1646,33 @@ struct ShortcutRecorderCard: View {
         }
 
         if event.keyCode == UInt16(kVK_Escape) {
-            hintText = appState.interfaceLanguage == .simplifiedChinese ? "已取消录制。" : "Recording cancelled."
+            hintText = copy.recordingCancelled
             stopRecording()
             return nil
         }
 
         guard let shortcut = WakeShortcut.from(event: event) else {
-            hintText = appState.interfaceLanguage == .simplifiedChinese ? "暂不支持这个按键，请使用字母或数字键。" : "That key is not supported yet. Use letters or numbers."
+            hintText = copy.unsupportedShortcutKey
             return nil
         }
 
         guard shortcut.hasAnyModifier else {
-            hintText = appState.interfaceLanguage == .simplifiedChinese ? "请至少加入一个修饰键，例如 Control、Command、Option 或 Shift。" : "Add at least one modifier key like Control, Command, Option, or Shift."
+            hintText = copy.shortcutNeedsModifier
             return nil
         }
 
         appState.updateWakeShortcut(shortcut)
-        hintText = appState.interfaceLanguage == .simplifiedChinese
-            ? "快捷键已更新为 \(shortcut.localizedDisplayName(language: appState.interfaceLanguage))."
-            : "Shortcut updated to \(shortcut.localizedDisplayName(language: appState.interfaceLanguage))."
+        hintText = appState.copy.applyingShortcut(shortcut)
         stopRecording()
         return nil
     }
 
     private var idleHint: String {
-        appState.interfaceLanguage == .simplifiedChinese
-            ? "点击“录制快捷键”，然后按下新的快捷键组合。"
-            : "Click record, then press the new shortcut."
+        copy.shortcutRecorderIdleHint
     }
 
     private var recordingHint: String {
-        appState.interfaceLanguage == .simplifiedChinese
-            ? "现在按下新的快捷键组合。按 Escape 可取消。"
-            : "Press the new shortcut now. Press Escape to cancel."
+        copy.shortcutRecorderRecordingHint
     }
 }
 
@@ -2067,12 +1682,15 @@ struct ShortcutModifierButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 12, weight: .semibold))
-            .foregroundStyle(isSelected ? .white : .primary)
+            .foregroundStyle(isSelected ? Color.white : Color.primary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
+            .frame(minWidth: 70)
             .background(
-                Capsule()
-                    .fill(isSelected ? Color.accentColor.opacity(configuration.isPressed ? 0.75 : 0.95) : Color.black.opacity(configuration.isPressed ? 0.10 : 0.05))
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(isSelected ? Color.accentColor : Color.black.opacity(0.05))
             )
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
     }
 }

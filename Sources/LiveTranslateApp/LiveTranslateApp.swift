@@ -14,15 +14,34 @@ struct LiveTranslateApp: App {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let appState = AppState()
-    private let overlayWindowManager = OverlayWindowManager()
-    private let hotKeyManager = GlobalHotKeyManager.shared
+    private let appState: AppState
+    private let overlayWindowManager: OverlayWindowManager
+    private let hotKeyManager: HotKeyRegistering
     private var accessibilityMonitor: AccessibilityMonitor?
     private var settingsWindowController: SettingsWindowController?
     private var showSettingsObserver: NSObjectProtocol?
     private var wakeShortcutObserver: NSObjectProtocol?
     private var wakeShortcutRecordingObserver: NSObjectProtocol?
     private var isRecordingWakeShortcut = false
+    private var isApplyingWakeShortcutRollback = false
+
+    override init() {
+        self.appState = AppState()
+        self.overlayWindowManager = OverlayWindowManager()
+        self.hotKeyManager = GlobalHotKeyManager.shared
+        super.init()
+    }
+
+    init(
+        appState: AppState,
+        overlayWindowManager: OverlayWindowManager = OverlayWindowManager(),
+        hotKeyManager: HotKeyRegistering
+    ) {
+        self.appState = appState
+        self.overlayWindowManager = overlayWindowManager
+        self.hotKeyManager = hotKeyManager
+        super.init()
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -50,7 +69,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.registerWakeShortcut()
+                guard let self else {
+                    return
+                }
+                if self.isApplyingWakeShortcutRollback {
+                    self.isApplyingWakeShortcutRollback = false
+                    return
+                }
+                self.registerWakeShortcut()
             }
         }
 
@@ -83,14 +109,88 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        if let showSettingsObserver {
+            NotificationCenter.default.removeObserver(showSettingsObserver)
+            self.showSettingsObserver = nil
+        }
+        if let wakeShortcutObserver {
+            NotificationCenter.default.removeObserver(wakeShortcutObserver)
+            self.wakeShortcutObserver = nil
+        }
+        if let wakeShortcutRecordingObserver {
+            NotificationCenter.default.removeObserver(wakeShortcutRecordingObserver)
+            self.wakeShortcutRecordingObserver = nil
+        }
+    }
+
+    private func shouldSuppressNextWakeShortcutRegistration(for activeShortcut: WakeShortcut?) -> Bool {
+        guard let activeShortcut else {
+            return false
+        }
+        return activeShortcut != appState.wakeShortcut
+    }
+
+    private func clearWakeShortcutRollbackGuardIfNeeded() {
+        if isApplyingWakeShortcutRollback {
+            isApplyingWakeShortcutRollback = false
+        }
+    }
+
+    private func clearWakeShortcutWarningOnSuccess() {
+        appState.clearWakeShortcutWarning()
+    }
+
+    private func applyWakeShortcutFailure(activeShortcut: WakeShortcut?, message: String) {
+        isApplyingWakeShortcutRollback = shouldSuppressNextWakeShortcutRegistration(for: activeShortcut)
+        appState.applyWakeShortcutRegistrationResult(.failure(activeShortcut: activeShortcut, message: message))
+        if !isApplyingWakeShortcutRollback {
+            clearWakeShortcutRollbackGuardIfNeeded()
+        }
+    }
+
+    private func applyWakeShortcutRollback(activeShortcut: WakeShortcut, message: String) {
+        isApplyingWakeShortcutRollback = shouldSuppressNextWakeShortcutRegistration(for: activeShortcut)
+        appState.applyWakeShortcutRegistrationResult(.rolledBack(activeShortcut: activeShortcut, message: message))
+        if !isApplyingWakeShortcutRollback {
+            clearWakeShortcutRollbackGuardIfNeeded()
+        }
+    }
+
+    private func handleWakeShortcutRegistrationSuccess() {
+        clearWakeShortcutWarningOnSuccess()
+        clearWakeShortcutRollbackGuardIfNeeded()
+    }
+
+    private func removeObserver(_ observer: NSObjectProtocol?) {
+        if let observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+
+    deinit {}
+
+
+    func handleWakeShortcutRegistrationResult(_ result: HotKeyRegistrationResult) {
+        switch result {
+        case .success:
+            handleWakeShortcutRegistrationSuccess()
+        case let .rolledBack(activeShortcut, message):
+            applyWakeShortcutRollback(activeShortcut: activeShortcut, message: message)
+        case let .failure(activeShortcut, message):
+            applyWakeShortcutFailure(activeShortcut: activeShortcut, message: message)
+        }
+    }
+
     private func registerWakeShortcut() {
         guard !isRecordingWakeShortcut else {
             return
         }
 
-        hotKeyManager.start(shortcut: appState.wakeShortcut) {
+        let result = hotKeyManager.start(shortcut: appState.wakeShortcut, copy: appState.copy) {
             NotificationCenter.default.post(name: .overlayToggleRequested, object: nil)
         }
+        handleWakeShortcutRegistrationResult(result)
     }
 
     private func showSettingsWindow() {
